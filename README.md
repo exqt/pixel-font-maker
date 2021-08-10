@@ -1,5 +1,6 @@
 # Pixel Font Maker
-![](.github/screenshot.png)
+![](.github/screenshot.PNG)
+
 픽셀 폰트를 디자인하고 TTF 파일로 뽑을 수 있는 프로그램입니다.
 
 ## 조작
