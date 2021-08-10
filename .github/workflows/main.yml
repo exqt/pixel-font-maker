@@ -28,14 +28,14 @@ jobs:
     - name: clone static_site_repo
       run: |
         cd ..
-        git clone git@github.com:exqt/exqt.github.io.git static_site_repo
+        git clone https://github.com/exqt/exqt.github.io static_site_repo
     - name: install dependencies & build
       run: |
         yarn
         yarn build
     - name: move build files to static files repo
       run: |
-        mv ./public/* ../static_site_repo/pixel-font-maker
+        mv ./dist/* ../static_site_repo/pixel-font-maker
     - name: push changed files
       run: |
         cd ../static_site_repo
