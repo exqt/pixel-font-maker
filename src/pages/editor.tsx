@@ -10,6 +10,7 @@ import ReferenceFontOption from '../components/ReferenceFontOption';
 import GlyphInfo from '../components/GlyphInfo';
 import BackButton from '../components/common/BackButton';
 import EditorKeyListener from '../components/EditorKeyListener';
+import GlyphEditorTools from '../components/GlyphEditorTools';
 
 const Container = styled.div`
   width: 840px;
@@ -50,6 +51,7 @@ const EditorPage = () => {
       <ReferenceFontOption />
       <div style={{ display: 'flex', justifyContent: "space-between" }}>
         <div>
+          <GlyphEditorTools/>
           <GlyphEditor />
           <div style={{ display: 'grid', gridTemplateColumns: '50% 50%', marginTop: '4px' }}>
             <GlyphComponentList />

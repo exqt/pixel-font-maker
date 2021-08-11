@@ -1,5 +1,3 @@
-import opentype from "opentype.js";
-import Project from "./project";
 import { TTF } from "fonteditor-core";
 
 export class GlyphData {
@@ -52,12 +50,6 @@ export class GlyphData {
     return r;
   }
 
-  copyData(glyph: GlyphData) {
-    for (let i = 0; i < 32; i++) {
-      this.data[i] = glyph.data[i];
-    }
-  }
-
   getPixel(x: number, y: number) {
     if (!(0 <= x && x < 32 && 0 <= y && y < 32)) return 0;
     return (this.data[y] & (1<<x)) >> (x);
@@ -88,11 +80,9 @@ export class GlyphData {
   }
 
   merge(g: GlyphData) {
-    let ng = this.clone();
     for (let y = 0; y < 32; y++) {
-      ng.data[y] |= g.data[y];
+      this.data[y] |= g.data[y];
     }
-    return ng;
   }
 
   shift(dx: number, dy: number) {
@@ -100,6 +90,30 @@ export class GlyphData {
     for (let y = 0; y < 32; y++) {
       if (0 <= y - dy && y - dy < 32) {
         ng.data[y] = dx > 0 ? this.data[y - dy] << dx : this.data[y - dy] >> (-dx);
+      }
+    }
+    this.data = ng.data;
+  }
+
+  flipH() {
+    let w = this.getWidth();
+    let h = this.getHeight();
+    let ng = new GlyphData();
+    for (let x = 0; x < w; x++) {
+      for (let y = 0; y < h; y++) {
+        ng.setPixel(x, y, this.getPixel(w - 1 - x, y));
+      }
+    }
+    this.data = ng.data;
+  }
+
+  flipV() {
+    let w = this.getWidth();
+    let h = this.getHeight();
+    let ng = new GlyphData();
+    for (let x = 0; x < w; x++) {
+      for (let y = 0; y < h; y++) {
+        ng.setPixel(x, y, this.getPixel(x, h - 1 - y));
       }
     }
     this.data = ng.data;

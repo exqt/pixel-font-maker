@@ -117,4 +117,20 @@ export default class EditorState {
     this.setGlyphData(c);
     this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
   }
+
+  flipH() {
+    let c = this.glyphData.clone();
+    c.flipH();
+    this.pushGlyphData();
+    this.setGlyphData(c);
+    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+  }
+
+  flipV() {
+    let c = this.glyphData.clone();
+    c.flipV();
+    this.pushGlyphData();
+    this.setGlyphData(c);
+    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+  }
 }

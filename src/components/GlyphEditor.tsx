@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components'
 import { Layer, Rect, Text, Line, Stage, Path } from 'react-konva';
 import { KonvaEventObject } from 'konva/types/Node';
@@ -7,10 +7,8 @@ import { EditorStateContext } from '../contexts';
 import { observer } from 'mobx-react';
 import EditorState from '../models/editorState';
 import { toCell } from '../utils';
-import Project from '../models/project';
 import { BRUSHES } from '../misc/brushes';
-import Button from './common/Button';
-import { FaEraser, FaSearch } from 'react-icons/fa';
+import GlyphEditorTools from './GlyphEditorTools';
 
 const EditorWrapper = styled.div`
 `
@@ -197,21 +195,6 @@ const GlyphEditorMainLayer = (props: {glyph: GlyphData, editorState: EditorState
   )
 }
 
-const GlyphEditorTools = () => {
-  let editorState = useContext(EditorStateContext);
-
-  return (
-    <div>
-      <Button compact={true} onClick={() => editorState.clear()}>
-        <FaEraser/>
-      </Button>
-      <Button compact={true} onClick={() => editorState.setZoom((editorState.zoom + 1) % 3)}>
-        <FaSearch/>
-      </Button>
-    </div>
-  )
-}
-
 const applyBrush = (g: GlyphData, brushType: number, x: number, y: number, bit: number) => {
   let b = BRUSHES[brushType];
   for (let [dx, dy] of b) {
@@ -277,7 +260,6 @@ const GlyphEditor = observer(() => {
 
   return (
     <EditorWrapper>
-      <GlyphEditorTools/>
       <Stage
         width={editorSize}
         height={editorSize}

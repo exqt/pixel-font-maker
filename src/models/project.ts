@@ -201,10 +201,8 @@ class Project {
 
   getGlyphDataWithComponent(unicode: number) {
     let g = this.getGlyph(unicode);
-    let d = g.data;
-    for (let x of this.getGlyphs(g.getComponents()).map((g) => g.data)) {
-      d = d.merge(x);
-    }
+    let d = g.data.clone();
+    for (let x of this.getGlyphs(g.getComponents()).map((g) => g.data)) d.merge(x);
     return d;
   }
 
