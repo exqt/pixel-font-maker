@@ -70,8 +70,10 @@ export default class EditorState {
     this.clipboard = this.glyphData.clone();
   }
 
-  pasteGlyphData() {
-    if (this.clipboard) this.glyphData = this.clipboard.clone();
+  updateProject() {
+    let g = this.project.getGlyph(this.editingUnicode).clone();
+    g.setData(this.glyphData);
+    this.project.setGlyph(this.editingUnicode, g);
   }
 
   get cellSize() {
@@ -84,9 +86,15 @@ export default class EditorState {
     return 24;
   }
 
+  clear() {
+    this.pushGlyphData();
+    this.setGlyphData(new GlyphData());
+    this.updateProject();
+  }
+
   undo() {
     this.popGlyphData();
-    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+    this.updateProject();
   }
 
   cut() {
@@ -96,17 +104,15 @@ export default class EditorState {
 
   copy() {
     this.copyGlyphData();
+    this.updateProject();
   }
 
   paste() {
-    this.pasteGlyphData();
-    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
-  }
-
-  clear() {
-    this.pushGlyphData();
-    this.setGlyphData(new GlyphData());
-    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+    if (this.clipboard) {
+      this.pushGlyphData();
+      this.glyphData = this.clipboard.clone();
+      this.updateProject();
+    }
   }
 
   shift(dx: number, dy: number) {
@@ -115,7 +121,7 @@ export default class EditorState {
     this.pushGlyphData();
     this.copyGlyphData();
     this.setGlyphData(c);
-    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+    this.updateProject();
   }
 
   flipH() {
@@ -123,7 +129,7 @@ export default class EditorState {
     c.flipH();
     this.pushGlyphData();
     this.setGlyphData(c);
-    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+    this.updateProject();
   }
 
   flipV() {
@@ -131,6 +137,6 @@ export default class EditorState {
     c.flipV();
     this.pushGlyphData();
     this.setGlyphData(c);
-    this.project.getGlyph(this.editingUnicode).setData(this.glyphData);
+    this.updateProject();
   }
 }
