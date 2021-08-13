@@ -8,14 +8,16 @@ export type GlyphJSON = {
   data?: Array<string>
   components?: Array<number>
   name?: string
+  advanceWidth?: number
 }
 
-export const GlyphAttributeKeys = ["unicode", "data", "components", "name"];
+export const GlyphAttributeKeys = ["unicode", "data", "components", "name", "advanceWidth"];
 
 export class Glyph {
   data: GlyphData;
   components: Array<number> = [];
   name?: string;
+  advanceWidth?: number
 
   constructor(data?: GlyphData) {
     makeAutoObservable(this);
@@ -27,6 +29,7 @@ export class Glyph {
     let g = new Glyph(d);
     if (json.components) g.setComponents(json.components);
     g.name = json.name;
+    g.advanceWidth = json.advanceWidth;
     return g;
   }
 
@@ -37,7 +40,8 @@ export class Glyph {
       unicode: unicode,
       data: data,
       name: this.name,
-      components: this.components.length > 0 ? this.components : undefined
+      components: this.components.length > 0 ? this.components : undefined,
+      advanceWidth: this.advanceWidth
     }
   }
 
@@ -49,11 +53,15 @@ export class Glyph {
   }
 
   isEmpty() {
-    return this.components.length == 0 && this.data.isEmpty() && !this.name
+    return this.components.length == 0 && this.data.isEmpty() && !this.name && !this.advanceWidth;
   }
 
   setData(data: GlyphData) {
     this.data = data;
+  }
+
+  setAdvanceWidth(width?: number) {
+    this.advanceWidth = width;
   }
 
   addComponent(comp: number) {

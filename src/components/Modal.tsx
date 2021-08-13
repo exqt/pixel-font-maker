@@ -19,8 +19,6 @@ const ModalContentWrapper = styled.div`
   background: #3b3b3b;
   border-radius: 8px;
   padding: 24px;
-  min-height: 128px;
-  min-width: 256px;
   -webkit-box-shadow: 0px 5px 14px 0px rgba(0,0,0,0.75);
   box-shadow: 0px 5px 14px 0px rgba(0,0,0,0.75);
 `

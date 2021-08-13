@@ -85,7 +85,7 @@ const ProjectSettingModal = observer((props: {project: Project}) => {
         label="ascent"
         value={project.attr.ascent}
         onChangeValue={(n) => project.setAscent(n)}
-        minValue={0}
+        minValue={1}
         maxValue={32}
       />
       <form>

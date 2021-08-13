@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 
-const StyledInput = styled.input`
+export const StyledInput = styled.input`
   background-color: #222;
   color: #EEE;
   outline: none;
@@ -15,9 +15,11 @@ const Wrapper = styled.div`
 `
 
 interface TextInputProps {
-  label?: string;
-  value: string;
+  label?: string
+  value: string
+  placeholder?: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -28,7 +30,9 @@ const TextInput = (props: TextInputProps) => {
       <StyledInput
         type="text"
         value={props.value}
+        placeholder={props.placeholder}
         onChange={props.onChange}
+        onFocus={props.onFocus}
         onBlur={props.onBlur}
       />
     </Wrapper>

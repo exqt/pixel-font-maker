@@ -87,10 +87,11 @@ class Project {
   }
 
   getTTFGlyph(unicode: number, name?: string, advanceWidth?: number) : TTF.Glyph {
+    let g = this.getGlyph(unicode);
     let gd = this.getGlyphDataWithComponent(unicode);
     let contours = gd.getContours(this.attr.offsetX, this.attr.descent, SCALE);
 
-    advanceWidth = advanceWidth || this.getAdvanceWidth(gd);
+    advanceWidth = advanceWidth || g.advanceWidth || this.getAdvanceWidth(gd);
     let xMin, yMin, xMax, yMax;
 
     // (?) buggy if contours is empty
@@ -117,7 +118,7 @@ class Project {
       yMin: yMin,
       xMax: xMax,
       yMax: yMax,
-      advanceWidth: (advanceWidth || this.getAdvanceWidth(gd)) * SCALE,
+      advanceWidth: advanceWidth * SCALE,
       leftSideBearing: xMin,
       name: name || ("uni0x" + unicode.toString(16)),
       unicode: [unicode],
