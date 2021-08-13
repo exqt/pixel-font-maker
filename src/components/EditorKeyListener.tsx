@@ -1,13 +1,15 @@
 import React, { useContext, useEffect } from 'react';
-import { EditorStateContext } from '../contexts';
+import { AppStateContext, EditorStateContext } from '../contexts';
 
 const EditorKeyListener = () => {
+  let appState = useContext(AppStateContext);
   let editorState = useContext(EditorStateContext);
   let project = editorState.project;
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
+      if (appState.isModalOpen) return;
 
       if (e.ctrlKey) {
         if (e.key === "z") editorState.undo();
