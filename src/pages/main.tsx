@@ -35,7 +35,6 @@ const OpenButton = () => {
       appState.setPage("editor");
     }
     fileReader.readAsText(file);
-    console.log(file);
   }
 
   return (

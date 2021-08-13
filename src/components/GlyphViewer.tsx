@@ -126,9 +126,6 @@ const GlyphViewer = ((props: {}) => {
     glyphSetSelectionItems.push({id: i.toString(), name: s.name});
   }
 
-
-  console.log("render viewer");
-
   return (
     <GlyphViewerWrapper>
       <PageMenu>

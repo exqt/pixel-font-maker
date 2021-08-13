@@ -61,7 +61,6 @@ const AdvanceWidth = observer(() => {
       />
       <div
         onClick={(e) => {
-          console.log("remove");
           e.preventDefault();
           let g = project.getGlyph(unicode);
           g.setAdvanceWidth();
