@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { ReducerAction, useContext, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { AppStateContext, EditorStateContext } from '../contexts';
 import Project from '../models/project';
@@ -6,6 +6,8 @@ import Button from '../components/common/Button';
 import { FaGithub } from 'react-icons/fa';
 import { applyHangulTemplateDKB, applyHangulTemplateZIK } from '../misc/hangulSyllablesTemplate';
 import Selection from '../components/common/Selection';
+import EditorState from '../models/editorState';
+import AppState from '../models/appState';
 
 const Container = styled.div`
   width: 840px;
@@ -17,6 +19,18 @@ const StyledButtonText = styled.span`
   font-size: 20px;
 `
 
+const openProject = (file: File, editorState: EditorState, appState: AppState) => {
+  let fileReader = new FileReader();
+  fileReader.onload = () => {
+    let parsed = JSON.parse(fileReader.result.toString());
+    let proj = Project.loadJSON(parsed);
+    console.log(proj);
+    editorState.setProject(proj);
+    appState.setPage("editor");
+  }
+  fileReader.readAsText(file);
+}
+
 const OpenButton = () => {
   let upload = useRef<HTMLInputElement>();
   let appState = useContext(AppStateContext);
@@ -26,15 +40,7 @@ const OpenButton = () => {
     e.stopPropagation();
     e.preventDefault();
     let file = e.target.files[0];
-    let fileReader = new FileReader();
-    fileReader.onload = () => {
-      let parsed = JSON.parse(fileReader.result.toString());
-      let proj = Project.loadJSON(parsed);
-      console.log(proj);
-      editorState.setProject(proj);
-      appState.setPage("editor");
-    }
-    fileReader.readAsText(file);
+    openProject(file, editorState, appState);
   }
 
   return (
@@ -125,6 +131,38 @@ const Buttons = styled.div`
   }
 `
 
+const DropdownZoneWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+`
+
+const DropdownZone = () => {
+  const appState = useContext(AppStateContext);
+  const editorState = useContext(EditorStateContext);
+  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  }
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files) {
+      let f = e.dataTransfer.files[0];
+      openProject(f, editorState, appState);
+    }
+  }
+
+  return (
+    <DropdownZoneWrapper
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
+    </DropdownZoneWrapper>
+  )
+}
+
 const MainPage = () => {
   const appState = useContext(AppStateContext);
 
@@ -138,6 +176,7 @@ const MainPage = () => {
         <OpenButton/>
       </Buttons>
       <GitInfo/>
+      <DropdownZone/>
     </Container>
   );
 }
