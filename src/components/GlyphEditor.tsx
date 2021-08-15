@@ -25,6 +25,7 @@ const GlyphEditorOverlayLayer = observer((props: {mouseState: MouseState, editor
   let editorSize = editorState.editorSize;
   let cellSize = editorState.cellSize;
   let project = editorState.project;
+  let glyph = project.getGlyph(editorState.editingUnicode);
   const lineWidth = editorState.zoom == 0 ? [4, 2] : [2, 1];
 
   for (let x = 0; x < editorState.cells; x++) {
@@ -56,7 +57,7 @@ const GlyphEditorOverlayLayer = observer((props: {mouseState: MouseState, editor
     )
   }
 
-  let w = Math.max(0, project.getAdvanceWidth(editorState.glyphData) - project.attr.offsetX);
+  let w = glyph.advanceWidth || project.getAdvanceWidth(editorState.glyphData);
   let WidthIndicator =
     <Line
       x={project.attr.offsetX*cellSize}
@@ -142,7 +143,6 @@ const GlyphEditorBackLayer = observer((props: {editorState: EditorState }) => {
       }
     }
   }
-
 
   return (
     <Layer listening={false}>
