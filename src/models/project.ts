@@ -172,6 +172,7 @@ class Project {
 
       console.log(ttf);
 
+      font.sort();
       let b = font.write({ type: 'ttf' });
       const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
       saveAs(file, this.attr.name + ".ttf")
