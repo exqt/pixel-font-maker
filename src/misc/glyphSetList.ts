@@ -1,29 +1,4 @@
-export class GlyphSet {
-  name: string;
-  unicodes: Array<number>;
-
-  constructor(name: string, ranges?: Array<[number, number]>) {
-    this.name = name;
-    this.unicodes = [];
-    if (ranges) {
-      for (let [start, end] of ranges) {
-        for (let u = start; u <= end; u++) {
-          this.unicodes.push(u);
-        }
-      }
-    }
-  }
-
-  addUnicode(u: number) {
-    this.unicodes.push(u);
-  }
-
-  getUnicodes(i: number, length: number) {
-    return this.unicodes.slice(i, i + length);
-  }
-}
-
-import { Glyph } from "opentype.js";
+import GlyphSet from "../models/glyphSet";
 import ksx1001SyllablesSet from "./ksx1001";
 
 const asciiSet = new GlyphSet("ASCII", [[0, 0], [33, 127]]);
@@ -40,7 +15,7 @@ const koreanCompatibilityJamoSet = new GlyphSet("Korean Compatibility Jamo", [[0
 const koreanSyllables = new GlyphSet("Korean Syllables", [[0xAC00, 0xD7AF]]);
 const privateUseSet = new GlyphSet("Private Use", [[0xE000, 0xF8FF]]);
 
-let glyphSetList = [
+let GlyphSetList = [
   asciiSet,
   latinExtendedSet,
   greekSet,
@@ -57,4 +32,4 @@ let glyphSetList = [
   privateUseSet
 ];
 
-export default glyphSetList;
+export default GlyphSetList;

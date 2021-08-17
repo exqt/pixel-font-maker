@@ -6,7 +6,7 @@ import AppState from './models/appState'
 import EditorState from './models/editorState';
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === 's' && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+  if ((e.key === 's' || e.key == 'g') && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
     e.preventDefault();
   }
 }, false);

@@ -5,7 +5,7 @@ import Selection, { SelectionItem } from './common/Selection';
 import GlyphRenderer from './GlyphRenderer';
 import { toHex } from '../utils';
 import { EditorStateContext } from '../contexts';
-import glyphSetList, { GlyphSet } from '../misc/glyphSets';
+import GLYPH_SET_LIST from '../misc/glyphSetList';
 import Button from './common/Button';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 
@@ -97,7 +97,13 @@ const PageIndicator = (props: {page: number, totalPages: number, setPage: (page:
 
 const GLYPHS_PER_PAGE = 64;
 
-const GlyphViewer = ((props: {}) => {
+const GlyphViewer = observer(() => {
+  let editorState = useContext(EditorStateContext);
+  let glyphSetList = GLYPH_SET_LIST;
+  if (editorState.componentGlyphSet.length > 0) {
+    glyphSetList = glyphSetList.concat(editorState.componentGlyphSet);
+  }
+
   let [page, setPage_] = useState(1);
   let [glyphSetIdx, setGlyphSetIdx] = useState("0");
   let glyphSet = glyphSetList[parseInt(glyphSetIdx)];
@@ -121,9 +127,8 @@ const GlyphViewer = ((props: {}) => {
   }
 
   let glyphSetSelectionItems: Array<SelectionItem> = [];
-  for(let i = 0; i < glyphSetList.length; i++) {
-    let s = glyphSetList[i];
-    glyphSetSelectionItems.push({id: i.toString(), name: s.name});
+  for (const [i, gs] of glyphSetList.entries()) {
+    glyphSetSelectionItems.push({id: i.toString(), name: gs.name});
   }
 
   return (

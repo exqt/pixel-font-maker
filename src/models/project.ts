@@ -201,6 +201,10 @@ class Project {
     return unicodes.map((u) => this.getGlyph(u));
   }
 
+  getUnicodes() {
+    return Array.from(this.glyphs.keys());
+  }
+
   getGlyphDataWithComponent(unicode: number) {
     let g = this.getGlyph(unicode);
     let d = g.data.clone();
