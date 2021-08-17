@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import { AppStateContext, EditorStateContext } from './contexts';

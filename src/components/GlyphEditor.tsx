@@ -8,7 +8,6 @@ import { observer } from 'mobx-react';
 import EditorState from '../models/editorState';
 import { toCell } from '../utils';
 import { BRUSHES } from '../misc/brushes';
-import GlyphEditorTools from './GlyphEditorTools';
 
 const EditorWrapper = styled.div`
 `

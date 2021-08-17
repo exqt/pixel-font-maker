@@ -1,11 +1,10 @@
-import React, { useState, Component, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components'
 import GlyphEditor from '../components/GlyphEditor';
 import GlyphComponentList from '../components/GlyphComponentList'
 import GlyphViewer from '../components/GlyphViewer';
 import MenuBar from '../components/ProjectMenuBar';
 import { AppStateContext, EditorStateContext } from '../contexts';
-import EditorState from '../models/editorState';
 import ReferenceFontOption from '../components/ReferenceFontOption';
 import GlyphInfo from '../components/GlyphInfo';
 import BackButton from '../components/common/BackButton';

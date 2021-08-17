@@ -1,14 +1,10 @@
 import { observer } from "mobx-react";
 import React, { useContext } from "react";
-import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import styled from "styled-components";
-import { AppStateContext, EditorStateContext } from "../contexts";
+import { EditorStateContext } from "../contexts";
 import { toHex } from "../utils";
-import Button from "./common/Button";
 import NumberInput from "./common/NumberInput";
-import TExtInput from "./common/NumberInput";
-import TextInput from "./common/TextInput";
 
 const StyledGlyphInfo = styled.div`
   margin: 4px;

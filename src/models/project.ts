@@ -139,9 +139,7 @@ class Project {
 
     const emptyFontPath = "fonts/empty.ttf";
     fetch(emptyFontPath).then((res) => res.arrayBuffer()).then((buffer) => {
-      let font = Font.create(buffer, {
-        type: 'ttf',
-      });
+      let font = Font.create(buffer, { type: 'ttf' });
 
       let ttf = font.get();
       ttf.glyf = glyphs;

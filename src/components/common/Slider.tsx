@@ -1,4 +1,4 @@
-import React, { useState, Component, createRef, useContext, useEffect, useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components'
 
 const SliderWrapper = styled.div`

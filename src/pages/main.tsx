@@ -1,4 +1,4 @@
-import React, { ReducerAction, useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { AppStateContext, EditorStateContext } from '../contexts';
 import Project from '../models/project';

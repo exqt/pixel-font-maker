@@ -1,7 +1,5 @@
-import { TTF } from "fonteditor-core";
 import { makeAutoObservable } from "mobx";
 import { GlyphData } from "./glyphData";
-import Project from "./project";
 
 export type GlyphJSON = {
   unicode: number
@@ -64,16 +62,14 @@ export class Glyph {
     this.advanceWidth = width;
   }
 
-  addComponent(comp: number) {
+  addComponent(unicode: number) {
     let a = this.getComponents();
-    if (a.includes(comp)) return;
-    a = a.slice();
-    a.push(comp);
-    this.setComponents(a);
+    if (a.includes(unicode)) return;
+    this.setComponents(a.concat(unicode));
   }
 
-  removeComponent(comp: number) {
-    let a = this.components.filter((c) => c != comp);
+  removeComponent(unicode: number) {
+    let a = this.components.filter((c) => c != unicode);
     this.setComponents(a);
   }
 

@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import TextInput, { StyledInput } from "./TextInput";
+import React from "react";
+import { StyledInput } from "./TextInput";
 
 interface NumberInputProps {
   label?: string;

@@ -1,9 +1,8 @@
 import { observer } from "mobx-react";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { FaPlus } from "react-icons/fa";
 import styled from "styled-components";
 import { EditorStateContext,  } from "../contexts";
-import EditorState from "../models/editorState";
 import GlyphRenderer from "./GlyphRenderer";
 
 const StyledComponentList = styled.div `

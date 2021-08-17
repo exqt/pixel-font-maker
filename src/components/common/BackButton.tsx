@@ -1,4 +1,4 @@
-import React, { useState, Component, useContext, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components'
 import { FaCaretLeft } from 'react-icons/fa'
 
