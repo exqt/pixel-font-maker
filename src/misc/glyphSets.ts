@@ -35,12 +35,12 @@ const boxDrawingBlockElementSet = new GlyphSet("Box drawing & Block Elements", [
 const miscellaneousSymbolsSet = new GlyphSet("Miscellaneous Symbols", [[0x2600, 0x26FF]]);
 const CJKUnifiedIdeographs = new GlyphSet("CJK Unified Ideographs", [[0x4E00, 0x9FFF]]);
 const japaneseHiraganaSet = new GlyphSet("Japanese Hiragana", [[0x3040, 0x309F]]);
-const japaneseKatakanaSet = new GlyphSet("Japanese Katakana", [[0x30A0, 0x03FF]]);
+const japaneseKatakanaSet = new GlyphSet("Japanese Katakana", [[0x30A0, 0x30FF]]);
 const koreanCompatibilityJamoSet = new GlyphSet("Korean Compatibility Jamo", [[0x3130, 0x318F]]);
 const koreanSyllables = new GlyphSet("Korean Syllables", [[0xAC00, 0xD7AF]]);
 const privateUseSet = new GlyphSet("Private Use", [[0xE000, 0xF8FF]]);
 
-const glyphSetList = [
+let glyphSetList = [
   asciiSet,
   latinExtendedSet,
   greekSet,
