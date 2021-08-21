@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { FaTimes } from "react-icons/fa";
 import styled from "styled-components";
 import { EditorStateContext } from "../contexts";
+import { TOOLTIP_ZIK, TOOLTIP_DKB } from "../misc/hangulSyllablesTemplate";
 import { toHex } from "../utils";
 import NumberInput from "./common/NumberInput";
 
@@ -14,7 +15,7 @@ const Header = styled.h5`
   margin: 0px;
 `
 
-const GlyphInfoBlock = (props: {header: string, children: JSX.Element}) => {
+const GlyphInfoBlock = (props: {header: string, children: JSX.Element|JSX.Element[]}) => {
   return (
     <div>
       <Header>{props.header}</Header>
@@ -84,11 +85,38 @@ const AdvanceWidth = observer(() => {
   )
 })
 
+const getHint = (name: string) => {
+  if (!name) return null;
+
+  let l = name.split(" | ");
+  let TOOLTIPS = {
+    ZIK: TOOLTIP_ZIK,
+    DKB: TOOLTIP_DKB,
+  }
+
+  let tooltip;
+  let templateName = l[0];
+  if (templateName === "ZIK") tooltip = TOOLTIPS["ZIK"];
+  else if (templateName === "DKB") tooltip = TOOLTIPS["DKB"];
+  else return null;
+
+  let type = l[1];
+  let h;
+  if (type == "choseong") h = tooltip["choseong"];
+  else if (type == "jungseong") h = tooltip["jungseong"];
+  else if (type == "jongseong") h = tooltip["jongseong"];
+  else return null;
+
+  let r = parseInt(l[2]) - 1;
+  return h[r];
+}
+
 const GlyphInfo = observer(() => {
   let editorState = useContext(EditorStateContext);
   let project = editorState.project;
   let unicode = editorState.editingUnicode;
   let glyph = project.getGlyph(unicode);
+  let hint = getHint(glyph.name);
 
   return (
     <StyledGlyphInfo>
@@ -101,6 +129,11 @@ const GlyphInfo = observer(() => {
       <GlyphInfoBlock header={"ADVANCE WIDTH"}>
         <AdvanceWidth/>
       </GlyphInfoBlock>
+      { hint ?
+        <GlyphInfoBlock header={"HINT"}>
+          <span>{hint}</span>
+        </GlyphInfoBlock> : null
+      }
     </StyledGlyphInfo>
   )
 })

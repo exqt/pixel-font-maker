@@ -120,7 +120,7 @@ class Project {
       yMax: yMax,
       advanceWidth: advanceWidth * SCALE,
       leftSideBearing: xMin,
-      name: name || ("uni0x" + unicode.toString(16)),
+      name: name,
       unicode: [unicode],
     }
   }

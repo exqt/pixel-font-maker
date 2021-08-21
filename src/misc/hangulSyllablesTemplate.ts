@@ -1,14 +1,28 @@
 import { Glyph } from "../models/glyph";
 import Project from "../models/project";
 
-const setComponents = (project: Project, r: number, c: number, ptr: number) => {
+// 19 x 21 x 28
+//       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+// 초성: ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ (19개)
+// 중성: ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ (21개)
+// 종성:   ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ (28개)
+
+const choseongs = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+const jungseongs = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
+const jongseongs = " ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ";
+
+const setComponents = (project: Project, r: number, c: number, ptr: number, templateID: string, type: "choseong" | "jungseong" | "jongseong") => {
   let components:  Array<Array<number>> = [];
+  let s = "";
+  if (type === "choseong") s = choseongs;
+  else if (type == "jungseong") s = jungseongs;
+  else if (type == "jongseong") s = jongseongs;
 
   for (let i = 0; i < r; i++) {
     components.push([]);
     for (let j = 0; j < c; j++) {
       let g = new Glyph();
-      g.name = "hangul component";
+      g.name = `${templateID} | ${type} | ${i+1} | ${s.charAt(j)}`;
 
       project.glyphs.set(ptr, g);
       components[i].push(ptr);
@@ -19,38 +33,34 @@ const setComponents = (project: Project, r: number, c: number, ptr: number) => {
   return components;
 }
 
-// 19 x 21 x 28
-//       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-// 초성: ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ (19개)
-// 중성: ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ (21개)
-// 종성:   ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ (28개)
-
-const choseongs = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-const jungseongs = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
-const jongseongs = " ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ";
 const ptrStart = 0xE000;
+
+export const TOOLTIP_ZIK = {
+  choseong: [
+    "받침 있고 중성 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합 (EX : 먄, 먠, 미)",
+    "받침 있고 중성 [ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ] 와 결합 (EX : 옹, 왱, 융)",
+    "받침 없고 중성 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합 (EX : 개, 네, 아)",
+    "받침 없고 중성 [ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ] 와 결합 (EX : 오, 뇌, 위)"
+  ],
+  jungseong: [
+    "받침 있는 글자의 중성부분 (EX : 감, 괨, 굼)",
+    "받침 없는 글자의 중성부분 (EX : 오, 우, 야)"
+  ],
+  jongseong: [
+    "중성 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합 (EX : 펭, 귄, 웱)",
+    "중성 [ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ] 와 결합 (EX : 뫔, 뭄, 밈)"
+  ]
+}
 
 export const applyHangulTemplateZIK = (project: Project) => {
   let ptr = ptrStart;
 
-  let choComponents = setComponents(project, 4, 19, ptr);
+  let choComponents = setComponents(project, 4, 19, ptr, "ZIK", "choseong");
   ptr += 4*19;
-  let jungComponents = setComponents(project, 2, 21, ptr);
+  let jungComponents = setComponents(project, 2, 21, ptr, "ZIK", "jungseong");
   ptr += 2*21;
-  let jongComponents = setComponents(project, 2, 28, ptr);
+  let jongComponents = setComponents(project, 2, 28, ptr, "ZIK", "jongseong");
   ptr += 2*28;
-
-  // 초성 : 총 4벌 (4줄)
-  // 1벌 : 받침 있고 중성 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합 (EX : 먄, 먠, 미)
-  // 2벌 : 받침 있고 중성 [ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ] 와 결합 (EX : 옹, 왱, 융)
-  // 3벌 : 받침 없고 중성 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합 (EX : 개, 네, 아)
-  // 4벌 : 받침 없고 중성 [ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ] 와 결합 (EX : 오, 뇌, 위)
-  // 중성 : 총 2벌 (2줄)
-  // 1벌 : 받침 있는 글자의 중성부분 (EX : 감, 괨, 굼)
-  // 2벌 : 받침 없는 글자의 중성부분 (EX : 오, 우, 야)
-  // 종성(받침) : 총 2벌 (2줄)
-  // 1벌 : 중성 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합 (EX : 펭, 귄, 웱)
-  // 2벌 : 중성 [ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ] 와 결합 (EX : 뫔, 뭄, 밈)
 
   const isVerticalJung = (n: number) => n < 8 || n == 20;
   for (let cho = 0; cho < 19; cho++) {
@@ -71,30 +81,42 @@ export const applyHangulTemplateZIK = (project: Project) => {
   }
 }
 
+export const TOOLTIP_DKB = {
+  choseong: [
+    "받침 없는 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합",
+    "받침 없는 [ㅗ ㅛ ㅡ]",
+    "받침 없는 [ㅜ ㅠ]",
+    "받침 없는 [ㅘ ㅙ ㅚ ㅢ]",
+    "받침 없는 [ㅝ ㅞ ㅟ]",
+    "받침 있는 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합",
+    "받침 있는 [ㅗ ㅛ ㅜ ㅠ ㅡ]",
+    "받침 있는 [ㅘ ㅙ ㅚ ㅢ ㅝ ㅞ ㅟ]",
+  ],
+  jungseong: [
+    "받침 없는 [ㄱ ㅋ] 와 결합 (EX : 괴, 가, 큐, 캬)",
+    "받침 없는 [ㄱ ㅋ] 이외의 자음과 결합 (EX : 외, 나, 류, 먀)",
+    "받침 있는 [ㄱ ㅋ] 와 결합 (EX : 광, 쾅, 굉, 괽)",
+    "받침 있는 [ㄱ ㅋ] 이외의 자음과 결합 (EX : 웅, 얅, 약, 약)"
+  ],
+  jongseong: [
+    "중성 [ㅏ ㅑ ㅘ] 와 결합",
+    "중성 [ㅓ ㅕ ㅚ ㅝ ㅟ ㅢ ㅣ]",
+    "중성 [ㅐ ㅒ ㅔ ㅖ ㅙ ㅞ]",
+    "중성 [ㅗ ㅛ ㅜ ㅠ ㅡ]"
+  ]
+}
+
+
 export const applyHangulTemplateDKB = (project: Project) => {
   let ptr = ptrStart;
 
-  let choComponents = setComponents(project, 8, 19, ptr);
+  let choComponents = setComponents(project, 8, 19, ptr, "DKB", "choseong");
   ptr += 8*19;
-  let jungComponents = setComponents(project, 4, 21, ptr);
+  let jungComponents = setComponents(project, 4, 21, ptr, "DKB", "jungseong");
   ptr += 4*21;
-  let jongComponents = setComponents(project, 4, 28, ptr);
+  let jongComponents = setComponents(project, 4, 28, ptr, "DKB", "jongseong");
   ptr += 4*28;
 
-  // 초성 : 총 8벌 (8줄)
-  // 1벌 : 받침없는 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합
-  // 2벌 : 받침없는 [ㅗ ㅛ ㅡ]
-  // 3벌 : 받침없는 [ㅜ ㅠ]
-  // 4벌 : 받침없는 [ㅘ ㅙ ㅚ ㅢ]
-  // 5벌 : 받침없는 [ㅝ ㅞ ㅟ]
-  // 6벌 : 받침 있는 [ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ] 와 결합
-  // 7벌 : 받침있는 [ㅗ ㅛ ㅜ ㅠ ㅡ]
-  // 8벌 : 받침있는 [ㅘ ㅙ ㅚ ㅢ ㅝ ㅞ ㅟ]
-  // 중성 : 총 4벌 (4줄)
-  // 1벌 : 받침없는 [ㄱ ㅋ] 와 결합 (EX : 괴, 가, 큐, 캬)
-  // 2벌 : 받침없는 [ㄱ ㅋ] 이외의 자음과 결합 (EX : 외, 나, 류, 먀)
-  // 2벌 : 받침 있는 [ㄱ ㅋ] 와 결합 (EX : 광, 쾅, 굉, 괽)
-  // 3벌 : 받침있는 [ㄱ ㅋ] 이외의 자음과 결합 (EX : 웅, 얅, 약, 약)
   // 종성 : 총 4벌 (4줄)
   // 1벌 : 중성 [ㅏ ㅑ ㅘ] 와 결합
   // 2벌 : 중성 [ㅓ ㅕ ㅚ ㅝ ㅟ ㅢ ㅣ]

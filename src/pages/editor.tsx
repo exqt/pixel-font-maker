@@ -52,7 +52,7 @@ const EditorPage = () => {
         <div>
           <GlyphEditorTools/>
           <GlyphEditor />
-          <div style={{ display: 'grid', gridTemplateColumns: '50% 50%', marginTop: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '50% 50%', marginTop: '4px', width: "432px" }}>
             <GlyphComponentList />
             <GlyphInfo />
           </div>
