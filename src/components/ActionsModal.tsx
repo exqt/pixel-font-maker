@@ -6,6 +6,7 @@ import Project from '../models/project';
 import NumberInput from './common/NumberInput';
 import Button from './common/Button';
 import { toHex } from '../utils';
+import Selection from './common/Selection';
 
 const Wrapper = styled.div`
   width: 400px;
@@ -48,7 +49,6 @@ const CopyAction = (props: {project: Project}) => {
 
   return (
     <div>
-      <h3>Bulk Copy</h3>
       <NumberInput
         label={"Start"} minValue={0} maxValue={0xFFFFFF}
         value={state.start}
@@ -76,11 +76,74 @@ const CopyAction = (props: {project: Project}) => {
   )
 }
 
+interface ShiftActionState {
+  dx: number
+  dy: number
+  start: number
+  end: number
+}
+
+const ShiftAction = (props: {project: Project}) => {
+  let [state, setState] = useState<ShiftActionState>({
+    dx: 0,
+    dy: 0,
+    start: 33,
+    end: 127,
+  })
+
+  const apply = () => {
+    let project = props.project;
+    for (let i = state.start; i <= state.end; i++) {
+      let g = project.getGlyph(i);
+      let gd = g.data.clone();
+      gd.shift(state.dx, state.dy);
+      g.setData(gd);
+    }
+  }
+
+  return (
+    <div>
+      <NumberInput
+        label={"dx"} minValue={-32} maxValue={32}
+        value={state.dx}
+        onChangeValue={(v) => setState({...state, dx: v})}
+      />
+      <NumberInput
+        label={"dy"} minValue={-32} maxValue={32}
+        value={state.dy}
+        onChangeValue={(v) => setState({...state, dy: v})}
+      />
+      <NumberInput
+        label={"Start"} minValue={0} maxValue={0xFFFFFF}
+        value={state.start}
+        onChangeValue={(v) => setState({...state, start: v})}
+      />
+      <NumberInput
+        label={"End"} minValue={0} maxValue={0xFFFFFF}
+        value={state.end}
+        onChangeValue={(v) => setState({...state, end: v})}
+      />
+      <Button onClick={apply}> Shift </Button>
+    </div>
+  )
+}
+
 const ActionsModal = (props: {project: Project}) => {
+  let [id, setId] = useState("copy");
+
   return (
     <Wrapper>
       <span>WARNING: BACKUP PROJECT RECOMMENDED</span>
-      <CopyAction project={props.project}/>
+      <Selection
+        items={[
+          {id: "copy", name: "Copy"},
+          {id: "shift", name: "Shift"}
+        ]}
+        selected={id}
+        onSelectChange={(i) => setId(i)}
+      />
+      { id == "copy" ? <CopyAction project={props.project}/> : null }
+      { id == "shift" ? <ShiftAction project={props.project}/> : null }
     </Wrapper>
   )
 }
