@@ -85,7 +85,7 @@ const AdvanceWidth = observer(() => {
   )
 })
 
-const getHint = (name: string) => {
+const getNote = (name: string) => {
   if (!name) return null;
 
   let l = name.split(" | ");
@@ -116,7 +116,7 @@ const GlyphInfo = observer(() => {
   let project = editorState.project;
   let unicode = editorState.editingUnicode;
   let glyph = project.getGlyph(unicode);
-  let hint = getHint(glyph.name);
+  let note = getNote(glyph.name);
 
   return (
     <StyledGlyphInfo>
@@ -129,9 +129,9 @@ const GlyphInfo = observer(() => {
       <GlyphInfoBlock header={"ADVANCE WIDTH"}>
         <AdvanceWidth/>
       </GlyphInfoBlock>
-      { hint ?
-        <GlyphInfoBlock header={"HINT"}>
-          <span>{hint}</span>
+      { note ?
+        <GlyphInfoBlock header={"NOTE"}>
+          <span>{note}</span>
         </GlyphInfoBlock> : null
       }
     </StyledGlyphInfo>
