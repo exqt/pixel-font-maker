@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyledInput } from "./TextInput";
 
 interface NumberInputProps {
@@ -11,22 +11,38 @@ interface NumberInputProps {
 }
 
 const isValid = (n: number, min: number, max: number) => {
-  return n && min <= n && n <= max;
+  return (typeof n === 'number') && min <= n && n <= max;
 }
 
 const NumberInput = (props: NumberInputProps) => {
+  let [temp, setTemp] = useState(props.value.toString());
+  let [org, setOrg] = useState("");
+
   return (
     <div>
-      { props.label ?  <span>{`${props.label} : `}</span> : null }
+      { props.label ? <span>{`${props.label} : `}</span> : null }
       <StyledInput
         type="number"
-        value={props.value}
+        value={temp}
         placeholder={props.placeholder}
-        min={props.minValue}
-        max={props.maxValue}
+        invalid={!isValid(parseInt(temp), props.minValue, props.maxValue)}
+        onFocus={(e) => {
+          setOrg(temp);
+          setTemp(props.value.toString());
+        }}
         onChange={(e) => {
-          let n = parseInt(e.target.value);
-          if (isValid(n, props.minValue, props.maxValue)) props.onChangeValue(n);
+          setTemp(e.target.value);
+        }}
+        onBlur={(e) => {
+          let n = parseInt(temp);
+          if (isValid(n, props.minValue, props.maxValue)) {
+            props.onChangeValue(n);
+          }
+          else {
+            let o = parseInt(org);
+            props.onChangeValue(o);
+            setTemp(org);
+          }
         }}
       />
     </div>

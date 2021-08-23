@@ -8,6 +8,7 @@ export const StyledInput = styled.input`
   border: 1px solid #555;
   font-size: 16px;
   width: 128px;
+  border: ${(props: {invalid?: boolean}) => props.invalid ? "1px solid red" : ""};
 `
 
 const Wrapper = styled.div`
