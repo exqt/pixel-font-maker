@@ -3,6 +3,10 @@
 
 픽셀 폰트를 디자인하고 TTF 파일로 뽑을 수 있는 프로그램입니다.
 
+## 샘플 폰트
+![](.github/sample.png)
+[Project + TTF](https://blog.naver.com/exqt_/222480693731)
+
 ## 조작
 ### 보드
 - mouse (left|right) (칠하기, 지우기)
