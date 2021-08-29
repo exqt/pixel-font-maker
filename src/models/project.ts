@@ -169,6 +169,17 @@ class Project {
       ttf["OS/2"].ulUnicodeRange3 = 262160;
       ttf["OS/2"].ulCodePageRange1 = 524289;
 
+      ttf["OS/2"].ySubscriptXSize = ttf.head.unitsPerEm / 2;
+      ttf["OS/2"].ySubscriptYSize = ttf.head.unitsPerEm / 2;
+      ttf["OS/2"].ySubscriptXOffset = 0;
+      ttf["OS/2"].ySubscriptYOffset = 0;
+      ttf["OS/2"].ySuperscriptXSize = ttf.head.unitsPerEm / 2;
+      ttf["OS/2"].ySuperscriptYSize = ttf.head.unitsPerEm / 2;
+      ttf["OS/2"].ySuperscriptXOffset = 0;
+      ttf["OS/2"].ySuperscriptYOffset = ttf.head.unitsPerEm / 2;
+      ttf["OS/2"].yStrikeoutSize = SCALE;
+      ttf["OS/2"].yStrikeoutPosition = (this.attr.ascent - this.attr.descent) * SCALE / 2;
+
       ttf["OS/2"].bFamilyType = 2;
       ttf["OS/2"].bSerifStyle = 2;
       ttf["OS/2"].bWeight = 6;
