@@ -1,9 +1,0 @@
-:root {
-  --bg: #444;
-  --color: #EEE;
-}
-
-html {
-  background-color: var(--bg) !important;
-  color: var(--color);
-}
