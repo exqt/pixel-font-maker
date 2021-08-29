@@ -167,6 +167,18 @@ class Project {
       ttf["OS/2"].ulUnicodeRange1 = 2415919111;
       ttf["OS/2"].ulUnicodeRange2 = 290520083;
       ttf["OS/2"].ulUnicodeRange3 = 262160;
+      ttf["OS/2"].ulCodePageRange1 = 524289;
+
+      ttf["OS/2"].bFamilyType = 2;
+      ttf["OS/2"].bSerifStyle = 2;
+      ttf["OS/2"].bWeight = 6;
+      ttf["OS/2"].bProportion = 1;
+      ttf["OS/2"].bContrast = 0;
+      ttf["OS/2"].bStrokeVariation = 1;
+      ttf["OS/2"].bArmStyle = 1;
+      ttf["OS/2"].bLetterform = 1;
+      ttf["OS/2"].bMidline = 1;
+      ttf["OS/2"].bXHeight = 1;
 
       console.log(ttf);
 
