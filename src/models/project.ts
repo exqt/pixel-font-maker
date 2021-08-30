@@ -152,7 +152,7 @@ class Project {
       ttf.name.version = "v" + this.version;
       ttf.name.copyright = `Copyright © ${(new Date).getFullYear()} ${this.attr.author}`
 
-      ttf.head.unitsPerEm = nearPower2(this.attr.ascent + this.attr.descent) * SCALE;
+      ttf.head.unitsPerEm = (this.attr.ascent + this.attr.descent) * SCALE;
 
       ttf.hhea.descent = -this.attr.descent*SCALE;
       ttf.hhea.ascent = this.attr.ascent*SCALE;
