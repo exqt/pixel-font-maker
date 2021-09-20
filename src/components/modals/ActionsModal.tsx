@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components'
 import { observer } from 'mobx-react';
-import TextInput from './common/TextInput';
-import Project from '../models/project';
-import NumberInput from './common/NumberInput';
-import Button from './common/Button';
-import { toHex } from '../utils';
-import Selection from './common/Selection';
+import TextInput from '../common/TextInput';
+import Project from '../../models/project';
+import NumberInput from '../common/NumberInput';
+import Button from '../common/Button';
+import { toHex } from '../../utils';
+import Selection from '../common/Selection';
 
 const Wrapper = styled.div`
   width: 400px;

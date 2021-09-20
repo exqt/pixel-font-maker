@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components'
 import { observer } from 'mobx-react';
-import TextInput from './common/TextInput';
-import Project from '../models/project';
-import NumberInput from './common/NumberInput';
-import { EditorStateContext } from '../contexts';
+import TextInput from '../common/TextInput';
+import Project from '../../models/project';
+import NumberInput from '../common/NumberInput';
+import { EditorStateContext } from '../../contexts';
 
 const Wrapper = styled.div`
   width: 300px;

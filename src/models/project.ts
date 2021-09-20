@@ -125,7 +125,7 @@ class Project {
     }
   }
 
-  export() {
+  async toFile() {
     const glyphs: TTF.Glyph[] = [];
 
     glyphs.push(this.getTTFGlyph(0, ".notdef"));
@@ -138,66 +138,70 @@ class Project {
     }
 
     const emptyFontPath = "fonts/empty.ttf";
-    fetch(emptyFontPath).then((res) => res.arrayBuffer()).then((buffer) => {
-      let font = Font.create(buffer, { type: 'ttf' });
+    const buffer = await fetch(emptyFontPath).then((res) => res.arrayBuffer());
+    let font = Font.create(buffer, { type: 'ttf' });
 
-      let ttf = font.get();
-      ttf.glyf = glyphs;
+    let ttf = font.get();
+    ttf.glyf = glyphs;
 
-      ttf.name.fontFamily = this.attr.name;
-      ttf.name.fontSubFamily = "regular";
-      ttf.name.fullName = this.attr.name;
-      ttf.name.postScriptName = this.attr.name;
-      ttf.name.uniqueSubFamily = this.attr.name;
-      ttf.name.version = "v" + this.version;
-      ttf.name.copyright = `Copyright © ${(new Date).getFullYear()} ${this.attr.author}`
+    ttf.name.fontFamily = this.attr.name;
+    ttf.name.fontSubFamily = "regular";
+    ttf.name.fullName = this.attr.name;
+    ttf.name.postScriptName = this.attr.name;
+    ttf.name.uniqueSubFamily = this.attr.name;
+    ttf.name.version = "v" + this.version;
+    ttf.name.copyright = `Copyright © ${(new Date).getFullYear()} ${this.attr.author}`
 
-      ttf.head.unitsPerEm = (this.attr.ascent + this.attr.descent) * SCALE;
+    ttf.head.unitsPerEm = (this.attr.ascent + this.attr.descent) * SCALE;
 
-      ttf.hhea.descent = -this.attr.descent*SCALE;
-      ttf.hhea.ascent = this.attr.ascent*SCALE;
+    ttf.hhea.descent = -this.attr.descent*SCALE;
+    ttf.hhea.ascent = this.attr.ascent*SCALE;
 
-      ttf["OS/2"].sTypoAscender = this.attr.ascent*SCALE;
-      ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
-      ttf["OS/2"].usWinAscent = this.attr.ascent*SCALE;
-      ttf["OS/2"].usWinDescent = this.attr.descent*SCALE;
-      ttf["OS/2"].sxHeight = 0;
-      ttf["OS/2"].sCapHeight = this.attr.ascent*SCALE;
+    ttf["OS/2"].sTypoAscender = this.attr.ascent*SCALE;
+    ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
+    ttf["OS/2"].usWinAscent = this.attr.ascent*SCALE;
+    ttf["OS/2"].usWinDescent = this.attr.descent*SCALE;
+    ttf["OS/2"].sxHeight = 0;
+    ttf["OS/2"].sCapHeight = this.attr.ascent*SCALE;
 
-      ttf["OS/2"].ulUnicodeRange1 = 2415919111;
-      ttf["OS/2"].ulUnicodeRange2 = 290520083;
-      ttf["OS/2"].ulUnicodeRange3 = 262160;
-      ttf["OS/2"].ulCodePageRange1 = 524289;
+    ttf["OS/2"].ulUnicodeRange1 = 2415919111;
+    ttf["OS/2"].ulUnicodeRange2 = 290520083;
+    ttf["OS/2"].ulUnicodeRange3 = 262160;
+    ttf["OS/2"].ulCodePageRange1 = 524289;
 
-      ttf["OS/2"].ySubscriptXSize = ttf.head.unitsPerEm / 2;
-      ttf["OS/2"].ySubscriptYSize = ttf.head.unitsPerEm / 2;
-      ttf["OS/2"].ySubscriptXOffset = 0;
-      ttf["OS/2"].ySubscriptYOffset = 0;
-      ttf["OS/2"].ySuperscriptXSize = ttf.head.unitsPerEm / 2;
-      ttf["OS/2"].ySuperscriptYSize = ttf.head.unitsPerEm / 2;
-      ttf["OS/2"].ySuperscriptXOffset = 0;
-      ttf["OS/2"].ySuperscriptYOffset = ttf.head.unitsPerEm / 2;
-      ttf["OS/2"].yStrikeoutSize = SCALE;
-      ttf["OS/2"].yStrikeoutPosition = (this.attr.ascent - this.attr.descent) * SCALE / 2;
+    ttf["OS/2"].ySubscriptXSize = ttf.head.unitsPerEm / 2;
+    ttf["OS/2"].ySubscriptYSize = ttf.head.unitsPerEm / 2;
+    ttf["OS/2"].ySubscriptXOffset = 0;
+    ttf["OS/2"].ySubscriptYOffset = 0;
+    ttf["OS/2"].ySuperscriptXSize = ttf.head.unitsPerEm / 2;
+    ttf["OS/2"].ySuperscriptYSize = ttf.head.unitsPerEm / 2;
+    ttf["OS/2"].ySuperscriptXOffset = 0;
+    ttf["OS/2"].ySuperscriptYOffset = ttf.head.unitsPerEm / 2;
+    ttf["OS/2"].yStrikeoutSize = SCALE;
+    ttf["OS/2"].yStrikeoutPosition = (this.attr.ascent - this.attr.descent) * SCALE / 2;
 
-      ttf["OS/2"].bFamilyType = 2;
-      ttf["OS/2"].bSerifStyle = 2;
-      ttf["OS/2"].bWeight = 6;
-      ttf["OS/2"].bProportion = 1;
-      ttf["OS/2"].bContrast = 0;
-      ttf["OS/2"].bStrokeVariation = 1;
-      ttf["OS/2"].bArmStyle = 1;
-      ttf["OS/2"].bLetterform = 1;
-      ttf["OS/2"].bMidline = 1;
-      ttf["OS/2"].bXHeight = 1;
+    ttf["OS/2"].bFamilyType = 2;
+    ttf["OS/2"].bSerifStyle = 2;
+    ttf["OS/2"].bWeight = 6;
+    ttf["OS/2"].bProportion = 1;
+    ttf["OS/2"].bContrast = 0;
+    ttf["OS/2"].bStrokeVariation = 1;
+    ttf["OS/2"].bArmStyle = 1;
+    ttf["OS/2"].bLetterform = 1;
+    ttf["OS/2"].bMidline = 1;
+    ttf["OS/2"].bXHeight = 1;
 
-      console.log(ttf);
+    console.log(ttf);
 
-      font.sort();
-      let b = font.write({ type: 'ttf' });
-      const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
-      saveAs(file, this.attr.name + ".ttf")
-    })
+    font.sort();
+    let b = font.write({ type: 'ttf' });
+    const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
+    return file;
+  }
+
+  async export() {
+    let file = await this.toFile();
+    saveAs(file, this.attr.name + ".ttf");
   }
 
   save() {
