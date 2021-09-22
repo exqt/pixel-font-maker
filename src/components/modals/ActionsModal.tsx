@@ -7,6 +7,7 @@ import NumberInput from '../common/NumberInput';
 import Button from '../common/Button';
 import { toHex } from '../../utils';
 import Selection from '../common/Selection';
+import { GlyphData } from '../../models/glyphData';
 
 const Wrapper = styled.div`
   width: 400px;
@@ -128,22 +129,71 @@ const ShiftAction = (props: {project: Project}) => {
   )
 }
 
+interface DeleteActionState {
+  start: number
+  end: number
+  delComponents: boolean,
+}
+
+const DeleteAction = (props: {project: Project}) => {
+  let [state, setState] = useState<DeleteActionState>({
+    start: 33,
+    end: 127,
+    delComponents: false
+  })
+
+  const apply = () => {
+    let project = props.project;
+    for (let i = state.start; i <= state.end; i++) {
+      let g = project.getGlyph(i);
+      g.setData(new GlyphData());
+      if (state.delComponents) g.setComponents([]);
+      project.setGlyph(i, g);
+    }
+  }
+
+  return (
+    <div>
+      <NumberInput
+        label={"Start"} minValue={0} maxValue={0xFFFFFF}
+        value={state.start}
+        onChangeValue={(v) => setState({...state, start: v})}
+      />
+      <NumberInput
+        label={"End"} minValue={0} maxValue={0xFFFFFF}
+        value={state.end}
+        onChangeValue={(v) => setState({...state, end: v})}
+      />
+      <label>Delete Components?</label>
+      <input
+        type="checkbox"
+        checked={state.delComponents}
+        onChange={(e) => setState({...state, delComponents: e.target.checked})}
+      />
+      <Divider/>
+      <Button onClick={apply}> Delete </Button>
+    </div>
+  )
+}
+
 const ActionsModal = (props: {project: Project}) => {
   let [id, setId] = useState("copy");
 
   return (
     <Wrapper>
-      <span>WARNING: BACKUP PROJECT RECOMMENDED</span>
+      <span style={{color: "red", fontWeight: "bold"}}>WARNING: BACKUP PROJECT RECOMMENDED</span>
       <Selection
         items={[
           {id: "copy", name: "Copy"},
-          {id: "shift", name: "Shift"}
+          {id: "shift", name: "Shift"},
+          {id: "delete", name: "Delete"}
         ]}
         selected={id}
         onSelectChange={(i) => setId(i)}
       />
       { id == "copy" ? <CopyAction project={props.project}/> : null }
       { id == "shift" ? <ShiftAction project={props.project}/> : null }
+      { id == "delete" ? <DeleteAction project={props.project}/> : null }
     </Wrapper>
   )
 }
