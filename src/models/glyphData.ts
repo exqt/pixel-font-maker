@@ -148,21 +148,22 @@ export class GlyphData {
   // |    |
   // <----v
 
-  getContours(offsetX: number = 0, offsetY: number = 0, scale: number = 1) {
+  getContours(offsetX = 0, offsetY = 0, scale = 1, size = 24) {
     const UP = 0;
     const RIGHT = 1;
     const DOWN = 2;
     const LEFT = 3;
 
-    let arrows: Array<Array<[number, number]>> = new Array<Array<[number, number]>>(33*33);
-    let toVertex = (x: number, y: number) => x*33 + y;
-    let toPosition = (v: number): [number, number] => [Math.floor(v / 33), v % 33];
+    size += 1;
+    let arrows: Array<Array<[number, number]>> = new Array<Array<[number, number]>>(size*size);
+    let toVertex = (x: number, y: number) => x*size + y;
+    let toPosition = (v: number): [number, number] => [Math.floor(v / size), v % size];
 
-    for (let i = 0; i < 33*33; i++) arrows[i] = [];
+    for (let i = 0; i < size*size; i++) arrows[i] = [];
 
     // generate unit arrows
-    for (let y = 0; y < 33; y++) {
-      for (let x = 0; x < 33; x++) {
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
         let b0 = this.getPixel(x, y);
         let bl = this.getPixel(x - 1, y);
         let bd = this.getPixel(x, y - 1);
@@ -185,30 +186,30 @@ export class GlyphData {
 
     let contours: Array<TTF.Contour> = [];
     let contour: TTF.Contour = [];
-    let dfs = (v: number, dir: number) => {
-      if (arrows[v].length == 0) return;
-
-      let mn = 4;
-      let idx = -1;
-      for (let i = 0; i < arrows[v].length; i++) {
-        let ad = arrows[v][i][1];
-        let d = (ad - dir + 4) % 4;
-        if (d < mn) {
-          mn = d;
-          idx = i;
+    let tour = (v: number, dir: number) => {
+      while (arrows[v].length > 0) {
+        let mn = 4;
+        let idx = -1;
+        for (let i = 0; i < arrows[v].length; i++) {
+          let ad = arrows[v][i][1];
+          let d = (ad - dir + 4) % 4;
+          if (d < mn) {
+            mn = d;
+            idx = i;
+          }
         }
-      }
 
-      let u = arrows[v][idx];
-      arrows[v].splice(idx, 1);
-      let [x, y] = toPosition(v);
-      if (dir != u[1]) contour.push({x: x, y: y, onCurve: true});
-      dfs(...u);
+        let u = arrows[v][idx];
+        arrows[v].splice(idx, 1);
+        let [x, y] = toPosition(v);
+        if (dir != u[1]) contour.push({x: x, y: y, onCurve: true});
+        [v, dir] = [...u];
+      }
     }
 
-    for (let v = 0; v < 33*33; v++) {
+    for (let v = 0; v < size*size; v++) {
       while (arrows[v].length > 0) {
-        dfs(arrows[v][0][0], arrows[v][0][1]);
+        tour(arrows[v][0][0], arrows[v][0][1]);
       }
 
       if (contour.length > 0) {
