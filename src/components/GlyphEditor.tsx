@@ -63,7 +63,7 @@ const GlyphEditorOverlayLayer = observer((props: {mouseState: MouseState, editor
       y={2}
       points={[0, 0, w*cellSize, 0]}
       strokeWidth={4}
-      stroke="#3AB"
+      stroke={w <= editorState.cells ? "#3AB" : "#eb0"}
     />
 
   let mouseHover = BRUSHES[props.editorState.brushType].map((d, i) =>
