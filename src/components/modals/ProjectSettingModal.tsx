@@ -64,42 +64,49 @@ const ProjectSettingModal = observer((props: {project: Project}) => {
   return (
     <Wrapper>
       <TextInput
-        label="name"
+        label="Name"
         value={project.attr.name}
         onChange={(e) => project.setName(e.target.value)}
       />
       <TextInput
-        label="author"
+        label="Author"
         value={project.attr.author}
         onChange={(e) => project.setAuthor(e.target.value)}
       />
       <Divider/>
       <NumberInput
-        label="descent"
+        label="Descent"
         value={project.attr.descent}
         onChangeValue={(n) => project.setDescent(n)}
         minValue={0}
         maxValue={16}
       />
       <NumberInput
-        label="ascent"
+        label="Ascent"
         value={project.attr.ascent}
         onChangeValue={(n) => project.setAscent(n)}
         minValue={1}
         maxValue={32}
       />
+      <NumberInput
+        label="Line Gap"
+        value={project.attr.lineGap}
+        onChangeValue={(n) => project.setLineGap(n)}
+        minValue={0}
+        maxValue={16}
+      />
       <form>
         <input
           type="radio"
           value="monospace"
-          name="monospace"
+          name="Monospace"
           checked={project.attr.widthType == "monospace"}
           onChange={(e) => project.setWdidthType("monospace")}
         />Monospace
         <input
           type="radio"
           value="proportional"
-          name="proportional"
+          name="Proportional"
           checked={project.attr.widthType == "proportional"}
           onChange={(e) => project.setWdidthType("proportional")}
         />Proportional
@@ -109,6 +116,5 @@ const ProjectSettingModal = observer((props: {project: Project}) => {
     </Wrapper>
   )
 })
-
 
 export default ProjectSettingModal;

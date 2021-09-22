@@ -18,6 +18,7 @@ export interface IProjectAttributes {
   descent: number;
   ascent: number;
   offsetX: number;
+  lineGap: number;
 }
 
 interface ProjectJSON {
@@ -35,7 +36,7 @@ class Project {
   constructor(attr?: IProjectAttributes) {
     makeAutoObservable(this);
     this.glyphs = new ObservableMap();
-    this.attr = attr || {
+    this.attr = {
       name: "unnamed-font",
       author: "unknown",
       widthType: "monospace",
@@ -44,14 +45,15 @@ class Project {
       letterSpacing: 1,
       descent: 2,
       ascent: 8,
-      offsetX: 0
+      offsetX: 0,
+      lineGap: 0,
+      ...attr
     }
   }
 
   static loadJSON(p: ProjectJSON) {
-    let project = new Project();
+    let project = new Project(p.attr);
     project.version = p.version;
-    project.attr = p.attr;
 
     for (let g of p.glyphs) {
       let glyph = Glyph.loadJSON(g);
@@ -156,6 +158,7 @@ class Project {
 
     ttf.hhea.descent = -this.attr.descent*SCALE;
     ttf.hhea.ascent = this.attr.ascent*SCALE;
+    ttf.hhea.lineGap = this.attr.lineGap*SCALE;
 
     ttf["OS/2"].sTypoAscender = this.attr.ascent*SCALE;
     ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
@@ -286,6 +289,10 @@ class Project {
 
   setLetterSpacing(letterSpacing: number) {
     this.attr.letterSpacing = letterSpacing;
+  }
+
+  setLineGap(lineGap: number) {
+    this.attr.lineGap = lineGap;
   }
 }
 
