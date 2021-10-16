@@ -19,6 +19,7 @@ export interface IProjectAttributes {
   ascent: number;
   offsetX: number;
   lineGap: number;
+  maxWidth: number;
 }
 
 interface ProjectJSON {
@@ -47,6 +48,7 @@ class Project {
       ascent: 8,
       offsetX: 0,
       lineGap: 0,
+      maxWidth: 24,
       ...attr
     }
   }
@@ -217,6 +219,7 @@ class Project {
 
   setGlyph(unicode: number, glyph: Glyph) {
     if (glyph.isEmpty() && !isWhiteSpace(unicode)) return this.glyphs.delete(unicode);
+    glyph.data.limitWidth(this.attr.maxWidth);
     this.glyphs.set(unicode, glyph);
     this.changed = true;
   }
@@ -293,6 +296,10 @@ class Project {
 
   setLineGap(lineGap: number) {
     this.attr.lineGap = lineGap;
+  }
+
+  setMaxWidth(maxWidth: number) {
+    this.attr.maxWidth = maxWidth;
   }
 }
 

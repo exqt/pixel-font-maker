@@ -95,6 +95,13 @@ const ProjectSettingModal = observer((props: {project: Project}) => {
         minValue={0}
         maxValue={16}
       />
+      <NumberInput
+        label="Max Width"
+        value={project.attr.maxWidth}
+        onChangeValue={(n) => project.setMaxWidth(n)}
+        minValue={4}
+        maxValue={32}
+      />
       <form>
         <input
           type="radio"

@@ -150,6 +150,12 @@ const GlyphEditorBackLayer = observer((props: {editorState: EditorState }) => {
         width={512}
         height={512}
       />
+      <Rect
+        fill="#0002"
+        x={project.attr.maxWidth*cellSize}
+        width={512}
+        height={512}
+      />
       {editorState.referenceFont.enable ?
         <Path
           x={project.attr.offsetX*cellSize}
@@ -241,6 +247,9 @@ const GlyphEditor = observer(() => {
     setMouseState({...mouseState, down: -1});
 
     let gd = editorState.glyphData.clone();
+    gd.limitWidth(project.attr.maxWidth);
+    editorState.setGlyphData(gd);
+
     let g = project.getGlyph(editorState.editingUnicode);
     g.setData(gd);
     project.setGlyph(editorState.editingUnicode, g);

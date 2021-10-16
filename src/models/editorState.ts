@@ -53,7 +53,8 @@ export default class EditorState {
     this.zoom = zoom;
   }
 
-  setGlyphData(glyph: GlyphData) {
+  setGlyphData(glyph: GlyphData, limitWidth?: number) {
+    if (limitWidth) glyph.limitWidth(limitWidth);
     this.glyphData = glyph;
   }
 

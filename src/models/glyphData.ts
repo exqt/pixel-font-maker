@@ -144,6 +144,13 @@ export class GlyphData {
     return h + 1;
   }
 
+  limitWidth(w: number) {
+    let mask = (1 << w) - 1;
+    for (let i = 0; i < 32; i++) {
+      this.data[i] &= mask;
+    }
+  }
+
   // ^---->
   // |    |
   // <----v
