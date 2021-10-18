@@ -45,8 +45,9 @@ export class ReferenceFont {
   }
 
   getPathData(unicode: number) {
-    if (this.font) {
-      let path = this.font.getPath(String.fromCharCode(unicode), this.offsetX, -this.offsetY, this.scale);
+    let c = String.fromCharCode(unicode);
+    if (this.font && (this.font.encoding.charToGlyphIndex(c) !== 0 || unicode === 0)) {
+      let path = this.font.getPath(c, this.offsetX, -this.offsetY, this.scale);
       return path.toPathData(1);
     }
     else {
