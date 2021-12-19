@@ -17,7 +17,10 @@ module.exports = (env, options) => {
     devtool: prod ? false : "eval-source-map",
     devServer: {
       contentBase: path.resolve(__dirname, 'dist'),
-      writeToDisk: true
+      writeToDisk: true,
+      disableHostCheck: true,
+      host: "0.0.0.0",
+      port: 8000
     },
     resolve: {
       modules: [__dirname, 'src', 'node_modules'],
