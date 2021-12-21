@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { FaTimes } from "react-icons/fa";
 import styled from "styled-components";
 import { EditorStateContext } from "../contexts";
-import { TOOLTIP_ZIK, TOOLTIP_DKB } from "../misc/hangulSyllablesTemplate";
+import { HANGUL_TEMPLATES } from "../misc/hangulSyllablesTemplate";
 import { toHex } from "../utils";
 import NumberInput from "./common/NumberInput";
 
@@ -89,16 +89,11 @@ const getNote = (name: string) => {
   if (!name) return null;
 
   let l = name.split(" | ");
-  let TOOLTIPS = {
-    ZIK: TOOLTIP_ZIK,
-    DKB: TOOLTIP_DKB,
-  }
 
-  let tooltip;
   let templateName = l[0];
-  if (templateName === "ZIK") tooltip = TOOLTIPS["ZIK"];
-  else if (templateName === "DKB") tooltip = TOOLTIPS["DKB"];
-  else return null;
+  const hangulTemplate = HANGUL_TEMPLATES[templateName];
+  if (!hangulTemplate) return null;
+  const tooltip = hangulTemplate.tooltip;
 
   let type = l[1];
   let h;
