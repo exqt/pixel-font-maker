@@ -138,19 +138,18 @@ const hangulTemplateDKB = new HangulTemplate("DKB", 8, 4, 4, (cho, jung, jong) =
 })
 
 const hangulTemplateMinzkn = new HangulTemplate("MINZKN", 10, 6, 4, (cho, jung, jong) => {
-  //                           ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ
-  const choTypesWithoutFinal = [0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 3, 1, 2, 4, 4, 4, 2, 1, 3, 0];
-  const choTypesWithFinal =    [5, 5, 5, 5, 5, 5, 5, 5, 6, 8, 8, 8, 6, 7, 9, 9, 9, 7, 6, 8, 5];
-  const jongTypes =            [0, 2, 0, 2, 1, 2, 1, 2, 3, 0, 2, 1, 3, 3, 1, 2, 1, 3, 3, 1, 0];
-  const jungType = (jung: number) => {
+  //                 ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ
+  const choTypes  = [0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 3, 1, 2, 4, 4, 4, 2, 1, 3, 0];
+  const jongTypes = [0, 2, 0, 2, 1, 2, 1, 2, 3, 0, 2, 1, 3, 3, 1, 2, 1, 3, 3, 1, 0];
+  const jungType = (cho: number) => {
     if (cho == 0 || cho == 15) return 0;
     else if (cho == 18) return 1;
     else return 2;
   }
 
   return [
-    jong == 0 ? choTypesWithoutFinal[jung] : choTypesWithFinal[jung],
-    (jong == 0 ? 0 : 3) + jungType(jung),
+    (jong == 0 ? 0 : 5) + choTypes[jung],
+    (jong == 0 ? 0 : 3) + jungType(cho),
     jongTypes[jung]
   ]
 }, {
@@ -168,6 +167,7 @@ const hangulTemplateMinzkn = new HangulTemplate("MINZKN", 10, 6, 4, (cho, jung, 
   ],
   jungseong: [
     "받침 없는 초성 [ㄱ ㅋ] 과 결합 ",
+    "받침 있는 초성 [ㅎ] 과 결합 ",
     "받침 없는 초성 [ㄱ ㅋ ㅎ] 이외의 초성과 결합 ",
     "받침 있는 초성 [ㄱ ㅋ] 과 결합 ",
     "받침 있는 초성 [ㅎ] 과 결합 ",
@@ -175,8 +175,8 @@ const hangulTemplateMinzkn = new HangulTemplate("MINZKN", 10, 6, 4, (cho, jung, 
   ],
   jongseong: [
     "중성 [ㅏ ㅑ ㅘ ㅣ]",
-    "중성 [ㅐ ㅒ ㅔ ㅖ ㅙ ㅞ]",
     "중성 [ㅓ ㅕ ㅚ ㅝ ㅟ ㅢ]",
+    "중성 [ㅐ ㅒ ㅔ ㅖ ㅙ ㅞ]",
     "중성 [ㅗ ㅛ ㅜ ㅠ ㅡ]"
   ]
 })
@@ -226,8 +226,8 @@ const hangulTemplateHanterm = new HangulTemplate("HANTERM", 10, 7, 4, (cho, jung
   ],
   jongseong: [
     "중성 [ㅏ ㅑ ㅘ ㅣ]",
-    "중성 [ㅐ ㅒ ㅔ ㅖ ㅙ ㅞ]",
     "중성 [ㅓ ㅕ ㅚ ㅝ ㅟ ㅢ]",
+    "중성 [ㅐ ㅒ ㅔ ㅖ ㅙ ㅞ]",
     "중성 [ㅗ ㅛ ㅜ ㅠ ㅡ]"
   ]
 })
