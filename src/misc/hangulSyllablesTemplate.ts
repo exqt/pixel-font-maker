@@ -188,8 +188,8 @@ const hangulTemplateHanterm = new HangulTemplate("HANTERM", 10, 7, 4, (cho, jung
   const jungClass = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0];
   let jungType = -1;
   if (jungClass[jung] == 0) {
-    if (jong == 0) jungType = 0;
-    else if (jong == 2) jungType = 1;
+    if (jong == 0) jungType = 0; // 종성 없음
+    else if (jong == 4) jungType = 1; // ㄴ
     else jungType = 2;
   }
   else {
