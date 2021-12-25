@@ -65,6 +65,7 @@ const FontPreviewModal = observer((props: {url: string}) => {
       <Divider/>
       <GlobalStyle url={props.url}/>
       <PreviewTextarea
+        spellCheck={false}
         style={{fontSize: size + "px", position: "relative", left: offset.x + "px", top: offset.y + "px"}}
         value={text}
         onChange={(e) => setText(e.target.value)}
