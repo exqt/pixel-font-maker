@@ -4,6 +4,7 @@ const prod = mode === 'production';
 const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 const gitRevisionPlugin = new GitRevisionPlugin()
 const DefinePlugin = require('webpack').DefinePlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = (env, options) => {
   const prod = options.mode == 'production';
@@ -32,6 +33,9 @@ module.exports = (env, options) => {
         'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
         'BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
       }),
+      new BundleAnalyzerPlugin({
+        analyzerMode: "static",
+      })
     ],
     module: {
       rules: [
