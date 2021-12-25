@@ -33,9 +33,27 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 const FontPreviewModal = observer((props: {url: string}) => {
   let [text, setText] = useState("");
   let [size, setSize] = useState(12);
+  let [offset, setOffset] = useState<Position>({x: 0, y: 0});
+
+  useEffect(() => {
+    const update = () => {
+      let nx = 0, ny = 0;
+      if (window.innerWidth % 2 === 1) nx = 0.5;
+      if (window.innerWidth % 2 === 1) ny = 0.5; 
+      setOffset({x: nx, y: ny});
+    }
+
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   return (
     <Wrapper>
@@ -47,7 +65,7 @@ const FontPreviewModal = observer((props: {url: string}) => {
       <Divider/>
       <GlobalStyle url={props.url}/>
       <PreviewTextarea
-        style={{fontSize: size + "px"}}
+        style={{fontSize: size + "px", position: "relative", left: offset.x + "px", top: offset.y + "px"}}
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
