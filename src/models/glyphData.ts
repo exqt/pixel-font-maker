@@ -50,6 +50,23 @@ export class GlyphData {
     return r;
   }
 
+  toBDFFormat(maxWidth: number) {
+    let reverseBit = (n: number) => {
+      let m: number = 0;
+      for (let i = 0; i < maxWidth; i++) {
+        m |= ((n & (1 << i)) ? 1 : 0) << (maxWidth - 1 - i);
+      }
+      return m;
+    }
+    return "BITMAP\n" + 
+      Array.from(this.data)
+      .slice(0, this.getHeight())
+      .reverse()
+      .map((v) => reverseBit(v))
+      .map((v) => v.toString(16).toUpperCase().padStart(Math.ceil(maxWidth/4), "0"))
+      .join("\n");
+  }
+
   getPixel(x: number, y: number) {
     if (!(0 <= x && x < 32 && 0 <= y && y < 32)) return 0;
     return (this.data[y] & (1<<x)) >> (x);

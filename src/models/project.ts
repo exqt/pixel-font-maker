@@ -5,6 +5,7 @@ import { isWhiteSpace, nearPower2, toHex } from "../utils";
 import { Glyph, GlyphAttributeKeys, GlyphJSON } from "./glyph";
 import { Font, TTF } from "fonteditor-core";
 import NOTDEF_GLYPH from "../misc/defaultNotdef";
+import { woff2 } from 'fonteditor-core';
 
 const SCALE = 16;
 
@@ -129,7 +130,7 @@ class Project {
     }
   }
 
-  async toFile() {
+  async toTrueTypeFile(type: string) {
     const glyphs: TTF.Glyph[] = [];
 
     glyphs.push(this.getTTFGlyph(0, ".notdef"));
@@ -166,7 +167,7 @@ class Project {
     ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
     ttf["OS/2"].usWinAscent = this.attr.ascent*SCALE;
     ttf["OS/2"].usWinDescent = this.attr.descent*SCALE;
-    ttf["OS/2"].sxHeight = 0;
+    ttf["OS/2"].sxHeight = (this.glyphs.get(120).data.getHeight() - this.attr.descent) * SCALE;
     ttf["OS/2"].sCapHeight = this.attr.ascent*SCALE;
 
     ttf["OS/2"].ulUnicodeRange1 = 2415919111;
@@ -199,14 +200,75 @@ class Project {
     console.log(ttf);
 
     font.sort();
-    let b = font.write({ type: 'ttf' });
-    const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
+    if (type == 'ttf') {
+      let b = font.write({ type: 'ttf' });
+      const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
+      return file;
+    }
+    else if (type == 'woff2') {
+      await woff2.init('/fonts/woff2.wasm');
+      let b = font.write({ type: 'woff2' });
+      const file = new File([b], this.attr.name + ".woff2", { type: 'font/woff2' });
+      return file;
+    }
+  }
+
+  toBDFFile() {
+    let b: Array<string> = [];
+    let size = this.attr.ascent + this.attr.descent;
+    b.push(
+`STARTFONT 2.1
+FONT -${this.attr.name}-${"Regular"}-${"R"}-${"Regular"}--${size}-${size}-${75}-c-${80}-${"iso10646-1"}
+SIZE ${size} ${75} ${75}
+FONTBOUNDINGBOX ${this.attr.maxWidth} ${size} ${0} ${-this.attr.descent}
+STARTPROPERTIES ${10}
+FAMILY_NAME ${this.attr.name}
+WEIGHT_NAME ${"Regular"}
+FONT_VERSION ${"1.0"}
+COPYRIGHT Copyright © ${(new Date).getFullYear()} ${this.attr.author}
+FOUNDRY PIXEL FONT MAKER
+FONT_ASCENT ${this.attr.ascent}
+FONT_DESCENT ${this.attr.descent}
+CAP_HEIGHT ${this.attr.ascent}
+FONT_SIZE ${this.attr.ascent + this.attr.descent}
+X_HEIGHT ${this.glyphs.get(120).data.getHeight() - this.attr.descent}
+ENDPROPERTIES
+CHARS ${this.glyphs.size + 1}
+`
+    )
+
+    const makeChar = (unicode: number, gd: GlyphData, w?: number) => {
+      w = w ? w : this.getAdvanceWidth(gd);
+      return `STARTCHAR U+${unicode.toString(16).padStart(4, "0")}
+ENCODING ${unicode}
+SWIDTH ${500} 0
+DWIDTH ${w} 0
+BBX ${w} ${gd.getHeight()} ${0} ${-this.attr.descent}
+${gd.toBDFFormat(this.attr.maxWidth)}
+ENDCHAR
+`;
+    }
+
+    b.push(makeChar(32, new GlyphData(), this.attr.widthType == "monospace" ? this.attr.fixedWidth : this.attr.spaceWidth));
+    this.glyphs.forEach((g, unicode) => {
+      let gd = this.getGlyphDataWithComponent(unicode);
+      b.push(makeChar(unicode, gd));
+    });
+    b.push("ENDFONT");
+
+    const file = new File([b.join("")], this.attr.name + ".bdf", { type: 'font/bdf' });
     return file;
   }
 
-  async export() {
-    let file = await this.toFile();
-    saveAs(file, this.attr.name + ".ttf");
+  async export(type: string) {
+    if (type == "ttf" || type == "woff2") {
+      let file = await this.toTrueTypeFile(type);
+      saveAs(file, this.attr.name + "." + type);
+    }
+    else if (type == "bdf") {
+      let file = this.toBDFFile();
+      saveAs(file, this.attr.name + "." + type);
+    }
   }
 
   save() {
