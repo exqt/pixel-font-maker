@@ -168,6 +168,25 @@ export class GlyphData {
     }
   }
 
+  getXYMinMax(s: number) {
+    if (this.isEmpty()) return {xMin: 0, yMin: 0, xMax: 0, yMax: 0}
+
+    let xMin = 32, yMin = 32, xMax = -1, yMax = -1;
+    for (let x = 0; x < 32; x++) {
+      for (let y = 0; y < 32; y++) {
+        if (this.getPixel(x, y) == 1) {
+          xMin = Math.min(xMin, x);
+          xMax = Math.max(xMax, x+1);
+          yMin = Math.min(yMin, y);
+          yMax = Math.max(yMax, y+1);
+        }
+      }
+    }
+    xMin *= s; yMin *= s;
+    xMax *= s; yMax *= s;
+    return {xMin, yMin, xMax, yMax};
+  }
+
   // ^---->
   // |    |
   // <----v

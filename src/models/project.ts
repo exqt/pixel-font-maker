@@ -8,6 +8,18 @@ import NOTDEF_GLYPH from "../misc/defaultNotdef";
 import { woff2 } from 'fonteditor-core';
 
 const SCALE = 16;
+const IDENTITY_TRANSFORM = {a:1, b:0, c:0, d:1, e:0, f:0};
+
+interface ICompGlyf {
+  flags: number,
+  glyphIndex: number,
+  transform: {a: number, b: number, c: number, d: number, e: number, f: number}
+}
+
+type TTFGlyphEx = TTF.Glyph & {
+  glyfs?: Array<ICompGlyf>,
+  compound: boolean
+}
 
 export interface IProjectAttributes {
   name: string;
@@ -34,6 +46,8 @@ class Project {
   glyphs: ObservableMap<number, Glyph>;
   attr: IProjectAttributes;
   changed = true;
+
+  private _glyphIndexMap: Map<number, number>;
 
   constructor(attr?: IProjectAttributes) {
     makeAutoObservable(this);
@@ -91,13 +105,13 @@ class Project {
     this.setGlyph(0x0, notdefGlyph);
   }
 
-  getTTFGlyph(unicode: number, name?: string, advanceWidth?: number) : TTF.Glyph {
+  getTTFGlyph(unicode: number, name?: string, advanceWidth?: number) : TTFGlyphEx {
     let g = this.getGlyph(unicode);
-    let gd = this.getGlyphDataWithComponent(unicode);
+    let gd = g.data;
+    let gdc = this.getGlyphDataWithComponent(unicode);
     let contours = gd.getContours(this.attr.offsetX, this.attr.descent, SCALE);
 
-    advanceWidth = advanceWidth || g.advanceWidth || this.getAdvanceWidth(gd);
-    let xMin, yMin, xMax, yMax;
+    advanceWidth = advanceWidth || g.advanceWidth || this.getAdvanceWidth(gdc);
 
     // (?) buggy if contours is empty
     if (contours.length === 0) {
@@ -105,38 +119,48 @@ class Project {
         {x: 0, y: 0, onCurve: true},
       ])
     }
+    
+    let xyminmax = gdc.getXYMinMax(SCALE);
 
-    xMin = contours[0][0].x; yMin = contours[0][0].y;
-    xMax = contours[0][0].x; yMax = contours[0][0].y;
-    for (let c of contours) {
-      for (let p of c) {
-        xMin = Math.min(xMin, p.x);
-        yMin = Math.min(yMin, p.y);
-        xMax = Math.max(xMax, p.x);
-        yMax = Math.max(yMax, p.y);
-      }
+    let glyfs: Array<ICompGlyf>;
+
+    if (g.components.length > 0) {
+      glyfs = [];
+      g.components.forEach((u, index) => {
+        glyfs.push({
+          flags: index != g.components.length-1 ? 5158 : 5126,
+          glyphIndex: this._glyphIndexMap.get(u),
+          transform : IDENTITY_TRANSFORM
+        })
+      })
     }
 
     return {
       contours: contours,
-      xMin: xMin,
-      yMin: yMin,
-      xMax: xMax,
-      yMax: yMax,
+      ...xyminmax,
+      compound: g.components.length > 0,
       advanceWidth: advanceWidth * SCALE,
-      leftSideBearing: xMin,
+      leftSideBearing: xyminmax.xMin,
       name: name,
       unicode: [unicode],
+      glyfs: glyfs
     }
   }
 
   async toTrueTypeFile(type: string) {
     const glyphs: TTF.Glyph[] = [];
+    this._glyphIndexMap = new Map();
 
     glyphs.push(this.getTTFGlyph(0, ".notdef"));
     glyphs.push(this.getTTFGlyph(32, "space", this.attr.widthType == "monospace" ? this.attr.fixedWidth : this.attr.spaceWidth));
+    this._glyphIndexMap.set(0, 0);
+    this._glyphIndexMap.set(32, 1);
 
     let keys = Array.from(this.glyphs.keys());
+    keys.forEach((u, index) => {
+      this._glyphIndexMap.set(u, this._glyphIndexMap.size);
+    })
+
     for (let unicode of keys) {
       if (unicode === 0 || unicode === 32) continue;
       glyphs.push(this.getTTFGlyph(unicode));
