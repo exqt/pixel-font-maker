@@ -17,7 +17,7 @@ const EditorKeyListener = () => {
         else if (e.key === "c") editorState.copy();
         else if (e.key === "v") editorState.paste();
         else if (e.key === "s") project.save();
-        else if (e.key === "g") editorState.generateComponentGlyphSet(editorState.editingUnicode);
+        else if (e.key === "g") editorState.generateSelectedComponentGlyphSet(editorState.editingUnicode);
       }
 
       if (e.key == "1" || e.key == "2" || e.key == "3") {
