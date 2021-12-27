@@ -191,7 +191,8 @@ class Project {
     ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
     ttf["OS/2"].usWinAscent = this.attr.ascent*SCALE;
     ttf["OS/2"].usWinDescent = this.attr.descent*SCALE;
-    ttf["OS/2"].sxHeight = (this.glyphs.get(120).data.getHeight() - this.attr.descent) * SCALE;
+    let xGlyph = this.glyphs.get(120);
+    ttf["OS/2"].sxHeight = xGlyph ? (xGlyph.data.getHeight() - this.attr.descent) * SCALE : 0;
     ttf["OS/2"].sCapHeight = this.attr.ascent*SCALE;
 
     ttf["OS/2"].ulUnicodeRange1 = 2415919111;
