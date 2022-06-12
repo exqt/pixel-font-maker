@@ -119,7 +119,7 @@ class Project {
         {x: 0, y: 0, onCurve: true},
       ])
     }
-    
+
     let xyminmax = gdc.getXYMinMax(SCALE);
 
     let glyfs: Array<ICompGlyf>;
@@ -171,6 +171,7 @@ class Project {
     let font = Font.create(buffer, { type: 'ttf' });
 
     let ttf = font.get();
+    let xGlyph = this.glyphs.get(120);
     ttf.glyf = glyphs;
 
     ttf.name.fontFamily = this.attr.name;
@@ -191,7 +192,6 @@ class Project {
     ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
     ttf["OS/2"].usWinAscent = this.attr.ascent*SCALE;
     ttf["OS/2"].usWinDescent = this.attr.descent*SCALE;
-    let xGlyph = this.glyphs.get(120);
     ttf["OS/2"].sxHeight = xGlyph ? (xGlyph.data.getHeight() - this.attr.descent) * SCALE : 0;
     ttf["OS/2"].sCapHeight = this.attr.ascent*SCALE;
 
@@ -241,6 +241,7 @@ class Project {
   toBDFFile() {
     let b: Array<string> = [];
     let size = this.attr.ascent + this.attr.descent;
+    let xGlyph = this.glyphs.get(120);
     b.push(
 `STARTFONT 2.1
 FONT -${this.attr.name}-${"Regular"}-${"R"}-${"Regular"}--${size}-${size}-${75}-c-${80}-${"iso10646-1"}
@@ -256,7 +257,7 @@ FONT_ASCENT ${this.attr.ascent}
 FONT_DESCENT ${this.attr.descent}
 CAP_HEIGHT ${this.attr.ascent}
 FONT_SIZE ${this.attr.ascent + this.attr.descent}
-X_HEIGHT ${this.glyphs.get(120).data.getHeight() - this.attr.descent}
+X_HEIGHT ${xGlyph ? xGlyph.data.getHeight() - this.attr.descent : 0}
 ENDPROPERTIES
 CHARS ${this.glyphs.size + 1}
 `
