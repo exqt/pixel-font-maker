@@ -10,6 +10,9 @@ import { observer } from 'mobx-react';
 const Wrapper = styled.div`
   background-color: #777;
   border: 1px solid black;
+  &:hover {
+    background-color: #999;
+  }
 `
 
 interface GlyphRendererProps {

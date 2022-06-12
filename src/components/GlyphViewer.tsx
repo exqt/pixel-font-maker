@@ -8,6 +8,7 @@ import { EditorStateContext } from '../contexts';
 import GLYPH_SET_LIST from '../misc/glyphSetList';
 import Button from './common/Button';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import GlyphSet, { HangulComponentGlyphSet } from '../models/glyphSet';
 
 const GlyphViewerWrapper = styled.div`
 `
@@ -23,14 +24,12 @@ const GlyphWrapper = styled.div`
 const StyledGlyphView = styled.div`
   ${(props: {highlight?: boolean, exists?: boolean}) => {
     if (props.highlight)
-      return css`background-color: green;`
+      return css`background-color: #40bd40;`
     else if (props.exists)
       return css`background-color: #FFFFFF55;`
   }}
-  :hover {
-    background-color: #ccc;
-  }
   margin-left: -1px;
+  margin-top: -1px;
 `
 
 const GlyphViewCharWrapper = styled.div`
@@ -39,7 +38,7 @@ const GlyphViewCharWrapper = styled.div`
   text-align: center;
 `
 
-const GlyphView = observer((props: {unicode?: number}) => {
+const GlyphView = observer((props: {unicode?: number, hideChar?: boolean}) => {
   let editorState = useContext(EditorStateContext);
   let project = editorState.project;
   let char = String.fromCharCode(props.unicode);
@@ -51,9 +50,11 @@ const GlyphView = observer((props: {unicode?: number}) => {
       exists={project.glyphs.has(props.unicode)}
       title={toHex(props.unicode)}
     >
-      <GlyphViewCharWrapper>
-        <span>{char}</span>
-      </GlyphViewCharWrapper>
+      {
+        !props.hideChar ?
+        <GlyphViewCharWrapper><span>{char}</span></GlyphViewCharWrapper> : 
+        <div style={{height: '1px'}}></div>
+      }
       <GlyphWrapper>
         <GlyphRenderer
           glyphData={project.getGlyphDataWithComponent(props.unicode)}
@@ -97,11 +98,60 @@ const PageIndicator = (props: {page: number, totalPages: number, setPage: (page:
 
 const GLYPHS_PER_PAGE = 64;
 
+const HangulCompnentsViewer = observer((props: {gs: HangulComponentGlyphSet}) => {
+  let choseongsViews = 
+    props.gs.components.choseongs.map((v, idx) => {
+      return (
+        <div key={idx} style={{display: 'flex'}}>
+          { v.map((u) => <GlyphView key={u} unicode={u} hideChar={true}/>) }
+        </div>
+      )
+    }) 
+
+  let jungseongViews = 
+    props.gs.components.jungseongs.map((v, idx) => {
+      return (
+        <div key={idx} style={{display: 'flex'}}>
+          { v.map((u) => <GlyphView key={u} unicode={u} hideChar={true}/>) }
+        </div>
+      )
+    }) 
+
+  let jongseongViews = 
+    props.gs.components.jongseongs.map((v, idx) => {
+      return (
+        <div key={idx} style={{display: 'flex'}}>
+          { v.map((u) => <GlyphView key={u} unicode={u} hideChar={true}/>) }
+        </div>
+      )
+    }) 
+
+  return (
+    <div>
+      <div>
+        {choseongsViews}
+      </div>
+      <div>
+        {jungseongViews}
+      </div>
+      <div>
+        {
+        }
+        {jongseongViews}
+      </div>
+    </div>
+  )
+})
+
 const GlyphViewer = observer(() => {
   let editorState = useContext(EditorStateContext);
-  let glyphSetList = GLYPH_SET_LIST;
-  if (editorState.componentGlyphSet.length > 0) {
-    glyphSetList = glyphSetList.concat(editorState.componentGlyphSet);
+  let glyphSetList = GLYPH_SET_LIST.slice();
+  if (editorState.selectedComponentGlyphSet.length > 0) {
+    glyphSetList = glyphSetList.concat(editorState.selectedComponentGlyphSet);
+  }
+
+  if (editorState.hangulComponentGlyphSet.length > 0) {
+    glyphSetList.splice(5, 0, editorState.hangulComponentGlyphSet);
   }
 
   let [page, setPage_] = useState(1);
@@ -143,11 +193,14 @@ const GlyphViewer = observer(() => {
             setGlyphSetIdx(i);
           }}
         />
-        <PageIndicator page={page} totalPages={totalPages} setPage={setPage}/>
+        { glyphSet.name != "Hangul Components" ? 
+            <PageIndicator page={page} totalPages={totalPages} setPage={setPage}/> : null 
+        }
       </PageMenu>
-      <GlyphViewerGrid>
-        {views}
-      </GlyphViewerGrid>
+      { glyphSet.name != "Hangul Components" ? 
+        <GlyphViewerGrid> {views} </GlyphViewerGrid> : 
+        <HangulCompnentsViewer gs={glyphSet as HangulComponentGlyphSet} />
+      }
     </GlyphViewerWrapper>
   );
 })

@@ -1,12 +1,10 @@
-import { makeAutoObservable } from "mobx";
+import Project from "./project";
 
-class GlyphSet {
+export default class GlyphSet {
   name: string;
   unicodes: Array<number>;
 
   constructor(name: string, ranges?: Array<[number, number]>) {
-    makeAutoObservable(this);
-
     this.name = name;
     this.unicodes = [];
     if (ranges) {
@@ -35,4 +33,41 @@ class GlyphSet {
   }
 }
 
-export default GlyphSet;
+export class HangulComponentGlyphSet extends GlyphSet {
+  components: {
+    choseongs: Array<Array<number>>
+    jungseongs: Array<Array<number>>
+    jongseongs: Array<Array<number>>
+  };
+
+  constructor(project: Project) {
+    super("Hangul Components");
+
+    this.components = {
+      choseongs: [],
+      jungseongs: [],
+      jongseongs: []
+    }
+
+    project.getUnicodes().forEach((u) => {
+      if (u < 0xE000) return;
+      let g = project.getGlyph(u);
+      if (!g.name) return;
+      let s = g.name.split(" | ");
+      if (s.length !== 4) return;
+
+      let type = s[1];
+      let idx = parseInt(s[2]) - 1;
+      let a;
+
+      if (type == "choseong") a = this.components.choseongs;
+      else if (type == "jungseong") a = this.components.jungseongs;
+      else if (type == "jongseong") a = this.components.jongseongs;
+      else return;
+
+      if (idx <= a.length) a.push([]);
+      a[idx].push(u);
+      this.unicodes.push(u);
+    });
+  }
+}

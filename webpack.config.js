@@ -4,6 +4,7 @@ const prod = mode === 'production';
 const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 const gitRevisionPlugin = new GitRevisionPlugin()
 const DefinePlugin = require('webpack').DefinePlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = (env, options) => {
   const prod = options.mode == 'production';
@@ -17,7 +18,10 @@ module.exports = (env, options) => {
     devtool: prod ? false : "eval-source-map",
     devServer: {
       contentBase: path.resolve(__dirname, 'dist'),
-      writeToDisk: true
+      writeToDisk: true,
+      disableHostCheck: true,
+      host: "0.0.0.0",
+      port: 8000
     },
     resolve: {
       modules: [__dirname, 'src', 'node_modules'],
@@ -29,6 +33,9 @@ module.exports = (env, options) => {
         'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
         'BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
       }),
+      new BundleAnalyzerPlugin({
+        analyzerMode: "static",
+      })
     ],
     module: {
       rules: [

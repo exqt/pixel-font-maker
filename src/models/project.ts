@@ -5,8 +5,21 @@ import { isWhiteSpace, nearPower2, toHex } from "../utils";
 import { Glyph, GlyphAttributeKeys, GlyphJSON } from "./glyph";
 import { Font, TTF } from "fonteditor-core";
 import NOTDEF_GLYPH from "../misc/defaultNotdef";
+import { woff2 } from 'fonteditor-core';
 
 const SCALE = 16;
+const IDENTITY_TRANSFORM = {a:1, b:0, c:0, d:1, e:0, f:0};
+
+interface ICompGlyf {
+  flags: number,
+  glyphIndex: number,
+  transform: {a: number, b: number, c: number, d: number, e: number, f: number}
+}
+
+type TTFGlyphEx = TTF.Glyph & {
+  glyfs?: Array<ICompGlyf>,
+  compound: boolean
+}
 
 export interface IProjectAttributes {
   name: string;
@@ -33,6 +46,8 @@ class Project {
   glyphs: ObservableMap<number, Glyph>;
   attr: IProjectAttributes;
   changed = true;
+
+  private _glyphIndexMap: Map<number, number>;
 
   constructor(attr?: IProjectAttributes) {
     makeAutoObservable(this);
@@ -90,13 +105,13 @@ class Project {
     this.setGlyph(0x0, notdefGlyph);
   }
 
-  getTTFGlyph(unicode: number, name?: string, advanceWidth?: number) : TTF.Glyph {
+  getTTFGlyph(unicode: number, name?: string, advanceWidth?: number) : TTFGlyphEx {
     let g = this.getGlyph(unicode);
-    let gd = this.getGlyphDataWithComponent(unicode);
+    let gd = g.data;
+    let gdc = this.getGlyphDataWithComponent(unicode);
     let contours = gd.getContours(this.attr.offsetX, this.attr.descent, SCALE);
 
-    advanceWidth = advanceWidth || g.advanceWidth || this.getAdvanceWidth(gd);
-    let xMin, yMin, xMax, yMax;
+    advanceWidth = advanceWidth || g.advanceWidth || this.getAdvanceWidth(gdc);
 
     // (?) buggy if contours is empty
     if (contours.length === 0) {
@@ -104,38 +119,48 @@ class Project {
         {x: 0, y: 0, onCurve: true},
       ])
     }
+    
+    let xyminmax = gdc.getXYMinMax(SCALE);
 
-    xMin = contours[0][0].x; yMin = contours[0][0].y;
-    xMax = contours[0][0].x; yMax = contours[0][0].y;
-    for (let c of contours) {
-      for (let p of c) {
-        xMin = Math.min(xMin, p.x);
-        yMin = Math.min(yMin, p.y);
-        xMax = Math.max(xMax, p.x);
-        yMax = Math.max(yMax, p.y);
-      }
+    let glyfs: Array<ICompGlyf>;
+
+    if (g.components.length > 0) {
+      glyfs = [];
+      g.components.forEach((u, index) => {
+        glyfs.push({
+          flags: index != g.components.length-1 ? 5158 : 5126,
+          glyphIndex: this._glyphIndexMap.get(u),
+          transform : IDENTITY_TRANSFORM
+        })
+      })
     }
 
     return {
       contours: contours,
-      xMin: xMin,
-      yMin: yMin,
-      xMax: xMax,
-      yMax: yMax,
+      ...xyminmax,
+      compound: g.components.length > 0,
       advanceWidth: advanceWidth * SCALE,
-      leftSideBearing: xMin,
+      leftSideBearing: xyminmax.xMin,
       name: name,
       unicode: [unicode],
+      glyfs: glyfs
     }
   }
 
-  async toFile() {
+  async toTrueTypeFile(type: string) {
     const glyphs: TTF.Glyph[] = [];
+    this._glyphIndexMap = new Map();
 
     glyphs.push(this.getTTFGlyph(0, ".notdef"));
     glyphs.push(this.getTTFGlyph(32, "space", this.attr.widthType == "monospace" ? this.attr.fixedWidth : this.attr.spaceWidth));
+    this._glyphIndexMap.set(0, 0);
+    this._glyphIndexMap.set(32, 1);
 
     let keys = Array.from(this.glyphs.keys());
+    keys.forEach((u, index) => {
+      this._glyphIndexMap.set(u, this._glyphIndexMap.size);
+    })
+
     for (let unicode of keys) {
       if (unicode === 0 || unicode === 32) continue;
       glyphs.push(this.getTTFGlyph(unicode));
@@ -166,7 +191,8 @@ class Project {
     ttf["OS/2"].sTypoDescender = -this.attr.descent*SCALE;
     ttf["OS/2"].usWinAscent = this.attr.ascent*SCALE;
     ttf["OS/2"].usWinDescent = this.attr.descent*SCALE;
-    ttf["OS/2"].sxHeight = 0;
+    let xGlyph = this.glyphs.get(120);
+    ttf["OS/2"].sxHeight = xGlyph ? (xGlyph.data.getHeight() - this.attr.descent) * SCALE : 0;
     ttf["OS/2"].sCapHeight = this.attr.ascent*SCALE;
 
     ttf["OS/2"].ulUnicodeRange1 = 2415919111;
@@ -199,14 +225,75 @@ class Project {
     console.log(ttf);
 
     font.sort();
-    let b = font.write({ type: 'ttf' });
-    const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
+    if (type == 'ttf') {
+      let b = font.write({ type: 'ttf' });
+      const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
+      return file;
+    }
+    else if (type == 'woff2') {
+      await woff2.init('/fonts/woff2.wasm');
+      let b = font.write({ type: 'woff2' });
+      const file = new File([b], this.attr.name + ".woff2", { type: 'font/woff2' });
+      return file;
+    }
+  }
+
+  toBDFFile() {
+    let b: Array<string> = [];
+    let size = this.attr.ascent + this.attr.descent;
+    b.push(
+`STARTFONT 2.1
+FONT -${this.attr.name}-${"Regular"}-${"R"}-${"Regular"}--${size}-${size}-${75}-c-${80}-${"iso10646-1"}
+SIZE ${size} ${75} ${75}
+FONTBOUNDINGBOX ${this.attr.maxWidth} ${size} ${0} ${-this.attr.descent}
+STARTPROPERTIES ${10}
+FAMILY_NAME ${this.attr.name}
+WEIGHT_NAME ${"Regular"}
+FONT_VERSION ${"1.0"}
+COPYRIGHT Copyright © ${(new Date).getFullYear()} ${this.attr.author}
+FOUNDRY PIXEL FONT MAKER
+FONT_ASCENT ${this.attr.ascent}
+FONT_DESCENT ${this.attr.descent}
+CAP_HEIGHT ${this.attr.ascent}
+FONT_SIZE ${this.attr.ascent + this.attr.descent}
+X_HEIGHT ${this.glyphs.get(120).data.getHeight() - this.attr.descent}
+ENDPROPERTIES
+CHARS ${this.glyphs.size + 1}
+`
+    )
+
+    const makeChar = (unicode: number, gd: GlyphData, w?: number) => {
+      w = w ? w : this.getAdvanceWidth(gd);
+      return `STARTCHAR U+${unicode.toString(16).padStart(4, "0")}
+ENCODING ${unicode}
+SWIDTH ${500} 0
+DWIDTH ${w} 0
+BBX ${w} ${gd.getHeight()} ${0} ${-this.attr.descent}
+${gd.toBDFFormat(this.attr.maxWidth)}
+ENDCHAR
+`;
+    }
+
+    b.push(makeChar(32, new GlyphData(), this.attr.widthType == "monospace" ? this.attr.fixedWidth : this.attr.spaceWidth));
+    this.glyphs.forEach((g, unicode) => {
+      let gd = this.getGlyphDataWithComponent(unicode);
+      b.push(makeChar(unicode, gd));
+    });
+    b.push("ENDFONT");
+
+    const file = new File([b.join("")], this.attr.name + ".bdf", { type: 'font/bdf' });
     return file;
   }
 
-  async export() {
-    let file = await this.toFile();
-    saveAs(file, this.attr.name + ".ttf");
+  async export(type: string) {
+    if (type == "ttf" || type == "woff2") {
+      let file = await this.toTrueTypeFile(type);
+      saveAs(file, this.attr.name + "." + type);
+    }
+    else if (type == "bdf") {
+      let file = this.toBDFFile();
+      saveAs(file, this.attr.name + "." + type);
+    }
   }
 
   save() {

@@ -7,6 +7,7 @@ import { FaFileExport, FaSave, FaCog } from 'react-icons/fa';
 import ProjectSettingModal from './modals/ProjectSettingModal';
 import ActionsModal from './modals/ActionsModal';
 import FontPreviewModal from './modals/FontPreviewModal';
+import ExportModal from './modals/ExportModal';
 
 const MenuBarWrapper = styled.div`
   border-bottom: 1px solid black;
@@ -22,7 +23,7 @@ const MenuBar = observer(() => {
   let appState = useContext(AppStateContext);
 
   const preview = async () => {
-    let file = await project.toFile();
+    let file = await project.toTrueTypeFile("ttf");
     let url = URL.createObjectURL(file);
     appState.setModalContent(<FontPreviewModal url={url}/>);
   }
@@ -33,7 +34,7 @@ const MenuBar = observer(() => {
         <FaSave/>
         <span>SAVE</span>
       </Button>
-      <Button onClick={() => project.export()}>
+      <Button onClick={() => appState.setModalContent(<ExportModal project={project}/>)}>
         <FaFileExport/>
         <span>EXPORT</span>
       </Button>

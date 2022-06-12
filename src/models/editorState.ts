@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx"
-import GlyphSet from "./glyphSet";
+import GlyphSet, { HangulComponentGlyphSet } from "./glyphSet";
 import { GlyphData } from "./glyphData";
 import Project from "./project";
 import { ReferenceFont } from "./referenceFont";
@@ -18,7 +18,8 @@ export default class EditorState {
   stack: Array<GlyphData>;
   clipboard?: GlyphData;
 
-  componentGlyphSet: GlyphSet;
+  selectedComponentGlyphSet: GlyphSet;
+  hangulComponentGlyphSet: GlyphSet;
 
   constructor() {
     makeAutoObservable(this);
@@ -37,11 +38,20 @@ export default class EditorState {
     this.stack = [];
     this.clipboard = null;
 
-    this.componentGlyphSet = new GlyphSet("...");
+    this.selectedComponentGlyphSet = new GlyphSet("...");
+  }
+
+  generateSelectedComponentGlyphSet(unicode: number) {
+    let gs = new GlyphSet(`Glyphs with component (${toHex(unicode)})`);
+    this.project.getUnicodes().forEach((u) => {
+      if (this.project.getGlyph(u).components.includes(unicode)) gs.addUnicode(u);
+    });
+    this.selectedComponentGlyphSet = gs;
   }
 
   setProject(project: Project) {
     this.project = project;
+    this.hangulComponentGlyphSet = new HangulComponentGlyphSet(project);
   }
 
   setEditingUnicode(unicode: number) {
@@ -145,13 +155,5 @@ export default class EditorState {
     this.pushGlyphData();
     this.setGlyphData(c);
     this.updateProject();
-  }
-
-  generateComponentGlyphSet(unicode: number) {
-    let gs = new GlyphSet(`Glyphs with component (${toHex(unicode)})`);
-    this.project.getUnicodes().forEach((u) => {
-      if (this.project.getGlyph(u).components.includes(unicode)) gs.addUnicode(u);
-    });
-    this.componentGlyphSet = gs;
   }
 }

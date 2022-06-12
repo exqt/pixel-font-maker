@@ -4,10 +4,11 @@ import { AppStateContext, EditorStateContext } from '../contexts';
 import Project from '../models/project';
 import Button from '../components/common/Button';
 import { FaGithub } from 'react-icons/fa';
-import { applyHangulTemplateDKB, applyHangulTemplateZIK } from '../misc/hangulSyllablesTemplate';
 import Selection from '../components/common/Selection';
 import EditorState from '../models/editorState';
 import AppState from '../models/appState';
+import { HANGUL_TEMPLATES } from '../misc/hangulSyllablesTemplate';
+import NumberInput from '../components/common/NumberInput';
 
 const Container = styled.div`
   width: 840px;
@@ -82,24 +83,23 @@ const GitInfo = () => {
 }
 
 interface NewProjectOptions {
-  hangulTemplate: string
+  hangulTemplate: string,
+  hangulTemplateUnicodeStart: number
 }
 
 const NewProjectModal = () => {
   const appState = useContext(AppStateContext);
   const editorState = useContext(EditorStateContext);
-  const [options, setOptions] = useState<NewProjectOptions>({ hangulTemplate: "none" });
+  const [options, setOptions] = useState<NewProjectOptions>({ hangulTemplate: "none", hangulTemplateUnicodeStart: 0xE000 });
 
   const createProject = () => {
     let project = new Project();
 
     project.addNotdefGlyph();
 
-    if (options.hangulTemplate == "zik") {
-      applyHangulTemplateZIK(project);
-    }
-    else if (options.hangulTemplate == "dkb") {
-      applyHangulTemplateDKB(project);
+    const hangulTemplate = HANGUL_TEMPLATES[options.hangulTemplate];
+    if (hangulTemplate) {
+      hangulTemplate.apply(project, options.hangulTemplateUnicodeStart);
     }
 
     editorState.setProject(project);
@@ -112,12 +112,21 @@ const NewProjectModal = () => {
       <Selection
         label="Hangul Template : "
         items={[
-          {id:"none", name: "None"},
-          {id:"zik", name: "Zik (Simple)"},
-          {id:"dkb", name: "DKB (Complex)"},
+          {id:"NONE", name: "None"},
+          {id:"ZIK", name: "Zik (4x2x2)"},
+          {id:"DKB", name: "DKB (8x4x4)"},
+          {id:"MINZKN", name: "minzkn (10x6x4)"},
+          {id:"HANTERM", name: "Hanterm (10x{3,4}x4)"},
         ]}
         onSelectChange={(id) => setOptions({...options, hangulTemplate: id})}
         selected={options.hangulTemplate}
+      />
+      <NumberInput
+        label={"Hangul Template Unicode Start"}
+        value={options.hangulTemplateUnicodeStart}
+        minValue={0xE000}
+        maxValue={0xF000}
+        onChangeValue={(s) => setOptions({...options, hangulTemplateUnicodeStart: s})}
       />
       <Button onClick={createProject}>CREATE</Button>
     </div>

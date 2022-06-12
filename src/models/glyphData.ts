@@ -50,6 +50,23 @@ export class GlyphData {
     return r;
   }
 
+  toBDFFormat(maxWidth: number) {
+    let reverseBit = (n: number) => {
+      let m: number = 0;
+      for (let i = 0; i < maxWidth; i++) {
+        m |= ((n & (1 << i)) ? 1 : 0) << (maxWidth - 1 - i);
+      }
+      return m;
+    }
+    return "BITMAP\n" + 
+      Array.from(this.data)
+      .slice(0, this.getHeight())
+      .reverse()
+      .map((v) => reverseBit(v))
+      .map((v) => v.toString(16).toUpperCase().padStart(Math.ceil(maxWidth/4), "0"))
+      .join("\n");
+  }
+
   getPixel(x: number, y: number) {
     if (!(0 <= x && x < 32 && 0 <= y && y < 32)) return 0;
     return (this.data[y] & (1<<x)) >> (x);
@@ -149,6 +166,25 @@ export class GlyphData {
     for (let i = 0; i < 32; i++) {
       this.data[i] &= mask;
     }
+  }
+
+  getXYMinMax(s: number) {
+    if (this.isEmpty()) return {xMin: 0, yMin: 0, xMax: 0, yMax: 0}
+
+    let xMin = 32, yMin = 32, xMax = -1, yMax = -1;
+    for (let x = 0; x < 32; x++) {
+      for (let y = 0; y < 32; y++) {
+        if (this.getPixel(x, y) == 1) {
+          xMin = Math.min(xMin, x);
+          xMax = Math.max(xMax, x+1);
+          yMin = Math.min(yMin, y);
+          yMax = Math.max(yMax, y+1);
+        }
+      }
+    }
+    xMin *= s; yMin *= s;
+    xMax *= s; yMax *= s;
+    return {xMin, yMin, xMax, yMax};
   }
 
   // ^---->
