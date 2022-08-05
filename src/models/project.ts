@@ -120,7 +120,7 @@ class Project {
       ])
     }
 
-    let xyminmax = gdc.getXYMinMax(SCALE);
+    let xyminmax = gdc.getXYMinMax(SCALE, -this.attr.offsetX, -this.attr.descent);
 
     let glyfs: Array<ICompGlyf>;
 

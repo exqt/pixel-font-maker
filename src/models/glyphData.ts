@@ -58,7 +58,7 @@ export class GlyphData {
       }
       return m;
     }
-    return "BITMAP\n" + 
+    return "BITMAP\n" +
       Array.from(this.data)
       .slice(0, this.getHeight())
       .reverse()
@@ -168,7 +168,7 @@ export class GlyphData {
     }
   }
 
-  getXYMinMax(s: number) {
+  getXYMinMax(s: number, offsetX: number, offsetY: number) {
     if (this.isEmpty()) return {xMin: 0, yMin: 0, xMax: 0, yMax: 0}
 
     let xMin = 32, yMin = 32, xMax = -1, yMax = -1;
@@ -182,6 +182,12 @@ export class GlyphData {
         }
       }
     }
+
+    xMin += offsetX;
+    xMax += offsetX;
+    yMin += offsetY;
+    yMax += offsetY;
+
     xMin *= s; yMin *= s;
     xMax *= s; yMax *= s;
     return {xMin, yMin, xMax, yMax};
