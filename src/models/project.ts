@@ -231,7 +231,7 @@ class Project {
       return file;
     }
     else if (type == 'woff2') {
-      await woff2.init('/fonts/woff2.wasm');
+      await woff2.init('fonts/woff2.wasm');
       let b = font.write({ type: 'woff2' });
       const file = new File([b], this.attr.name + ".woff2", { type: 'font/woff2' });
       return file;
