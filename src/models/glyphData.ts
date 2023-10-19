@@ -197,22 +197,23 @@ export class GlyphData {
   // |    |
   // <----v
 
-  getContours(offsetX = 0, offsetY = 0, scale = 1, size = 24) {
+  getContours(offsetX = 0, offsetY = 0, scale = 1) {
     const UP = 0;
     const RIGHT = 1;
     const DOWN = 2;
     const LEFT = 3;
 
-    size += 1;
-    let arrows: Array<Array<[number, number]>> = new Array<Array<[number, number]>>(size*size);
-    let toVertex = (x: number, y: number) => x*size + y;
-    let toPosition = (v: number): [number, number] => [Math.floor(v / size), v % size];
+    let width = this.getWidth() + 1;
+    let height = this.getHeight() + 1;
+    let arrows: Array<Array<[number, number]>> = new Array<Array<[number, number]>>((width+2)*(height+2)+1);
+    let toVertex = (x: number, y: number) => x + y*(width+1);
+    let toPosition = (v: number): [number, number] => [v % (width+1), Math.floor(v / (width+1))];
 
-    for (let i = 0; i < size*size; i++) arrows[i] = [];
+    for (let i = 0; i < (width+2)*(height+2) + 1; i++) arrows[i] = [];
 
     // generate unit arrows
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
         let b0 = this.getPixel(x, y);
         let bl = this.getPixel(x - 1, y);
         let bd = this.getPixel(x, y - 1);
@@ -220,14 +221,14 @@ export class GlyphData {
         if (b0 != 0 && bl == 0) { // up
           arrows[toVertex(x, y)].push([toVertex(x, y + 1), UP]);
         }
-        else if(b0 == 0 && bl != 0) { // down
+        else if (b0 == 0 && bl != 0) { // down
           arrows[toVertex(x, y + 1)].push([toVertex(x, y), DOWN]);
         }
 
         if (b0 != 0 && bd == 0) { // left
           arrows[toVertex(x + 1, y)].push([toVertex(x, y), LEFT]);
         }
-        else if(b0 == 0 && bd != 0) { // right
+        else if (b0 == 0 && bd != 0) { // right
           arrows[toVertex(x, y)].push([toVertex(x + 1, y), RIGHT]);
         }
       }
@@ -256,7 +257,7 @@ export class GlyphData {
       }
     }
 
-    for (let v = 0; v < size*size; v++) {
+    for (let v = 0; v < (width+2)*(height+2) + 1; v++) {
       while (arrows[v].length > 0) {
         tour(arrows[v][0][0], arrows[v][0][1]);
       }
