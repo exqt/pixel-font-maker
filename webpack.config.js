@@ -33,9 +33,11 @@ module.exports = (env, options) => {
         'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
         'BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
       }),
-      new BundleAnalyzerPlugin({
-        analyzerMode: "static",
-      })
+      /*
+        new BundleAnalyzerPlugin({
+          analyzerMode: "static",
+        })
+      */
     ],
     module: {
       rules: [
