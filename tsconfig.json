@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "outDir": "./public/",
     "sourceMap": true,
     "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es6",
-    "jsx": "react",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "useDefineForClassFields": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
   },
+  "include": ["src", "electron"]
 }

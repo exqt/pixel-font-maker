@@ -1,51 +1,58 @@
 {
   "name": "pixel-font-maker",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist-electron/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "webpack --mode production",
-    "test": "jest",
-    "depoly": "gh-pages -d dist"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "package": "vite build && electron-builder"
   },
   "dependencies": {
-    "file-saver": "^2.0.5",
     "fonteditor-core": "exqt/fonteditor-core",
-    "konva": "^7.2.5",
+    "konva": "^9.3.22",
     "mobx": "^6.3.0",
-    "mobx-react": "^7.1.0",
+    "mobx-react-lite": "^4.1.1",
     "opentype.js": "^1.3.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-icons": "^4.2.0",
-    "react-konva": "^17.0.2-0",
-    "styled-components": "^5.2.3"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
+    "react-konva": "^18.2.14",
+    "styled-components": "^6.3.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.13.16",
-    "@babel/preset-env": "^7.13.15",
-    "@babel/preset-typescript": "^7.13.0",
-    "@types/babel__core": "^7.1.14",
-    "@types/file-saver": "^2.0.2",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^14.14.41",
+    "@types/node": "^22.0.0",
     "@types/opentype.js": "^1.3.1",
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.3",
-    "@types/styled-components": "^5.1.9",
-    "babel-jest": "^26.6.3",
-    "css-loader": "^5.2.4",
-    "file-loader": "^6.2.0",
-    "git-revision-webpack-plugin": "^5.0.0",
-    "jest": "^26.6.3",
-    "style-loader": "^2.0.0",
-    "ts-loader": "^9.1.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.4",
-    "webpack": "^5.35.0",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2"
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.0.0",
+    "electron": "^40.4.1",
+    "electron-builder": "^26.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.0",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "build": {
+    "appId": "com.exqt.pixel-font-maker",
+    "productName": "Pixel Font Maker",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "linux": {
+      "target": ["AppImage"]
+    }
   }
 }

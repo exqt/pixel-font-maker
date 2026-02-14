@@ -1,5 +1,4 @@
 import { makeAutoObservable, ObservableMap } from "mobx";
-import { saveAs } from 'file-saver';
 import { GlyphData } from "./glyphData";
 import { isWhiteSpace, nearPower2, toHex } from "../utils";
 import { Glyph, GlyphAttributeKeys, GlyphJSON } from "./glyph";
@@ -166,8 +165,7 @@ class Project {
       glyphs.push(this.getTTFGlyph(unicode));
     }
 
-    const emptyFontPath = "fonts/empty.ttf";
-    const buffer = await fetch(emptyFontPath).then((res) => res.arrayBuffer());
+    const buffer = await window.electronAPI.readAsset("fonts/empty.ttf");
     let font = Font.create(buffer, { type: 'ttf' });
 
     let ttf = font.get();
@@ -227,14 +225,16 @@ class Project {
     font.sort();
     if (type == 'ttf') {
       let b = font.write({ type: 'ttf' });
-      const file = new File([b], this.attr.name + ".ttf", { type: 'font/ttf' });
-      return file;
+      return { data: b, name: this.attr.name + ".ttf" };
     }
     else if (type == 'woff2') {
-      await woff2.init('fonts/woff2.wasm');
+      const wasmBuffer = await window.electronAPI.readAsset("fonts/woff2.wasm");
+      const wasmBlob = new Blob([wasmBuffer], { type: 'application/wasm' });
+      const wasmUrl = URL.createObjectURL(wasmBlob);
+      await woff2.init(wasmUrl);
+      URL.revokeObjectURL(wasmUrl);
       let b = font.write({ type: 'woff2' });
-      const file = new File([b], this.attr.name + ".woff2", { type: 'font/woff2' });
-      return file;
+      return { data: b, name: this.attr.name + ".woff2" };
     }
   }
 
@@ -282,27 +282,43 @@ ENDCHAR
     });
     b.push("ENDFONT");
 
-    const file = new File([b.join("")], this.attr.name + ".bdf", { type: 'font/bdf' });
-    return file;
+    return { data: b.join(""), name: this.attr.name + ".bdf" };
   }
 
   async export(type: string) {
     if (type == "ttf" || type == "woff2") {
-      let file = await this.toTrueTypeFile(type);
-      saveAs(file, this.attr.name + "." + type);
+      let result = await this.toTrueTypeFile(type);
+      const filePath = await window.electronAPI.saveFile(
+        this.attr.name + "." + type,
+        [{ name: type.toUpperCase() + ' Font', extensions: [type] }]
+      );
+      if (filePath) {
+        await window.electronAPI.writeFile(filePath, result.data);
+      }
     }
     else if (type == "bdf") {
-      let file = this.toBDFFile();
-      saveAs(file, this.attr.name + "." + type);
+      let result = this.toBDFFile();
+      const filePath = await window.electronAPI.saveFile(
+        this.attr.name + ".bdf",
+        [{ name: 'BDF Font', extensions: ['bdf'] }]
+      );
+      if (filePath) {
+        await window.electronAPI.writeFile(filePath, result.data);
+      }
     }
   }
 
-  save() {
+  async save() {
     let o = this.toJSON();
     let jsonKeys = ["version", "attr", ...Object.keys(this.attr), "glyphs", ...GlyphAttributeKeys];
     let s = JSON.stringify(o, jsonKeys, "\t");
-    const file = new File([s], this.attr.name + ".pfp");
-    saveAs(file, this.attr.name + ".pfp");
+    const filePath = await window.electronAPI.saveFile(
+      this.attr.name + ".pfp",
+      [{ name: 'Pixel Font Project', extensions: ['pfp'] }]
+    );
+    if (filePath) {
+      await window.electronAPI.writeFile(filePath, s);
+    }
   }
 
   setGlyph(unicode: number, glyph: Glyph) {

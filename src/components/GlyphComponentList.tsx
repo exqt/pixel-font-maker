@@ -1,4 +1,4 @@
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
 import { FaPlus } from "react-icons/fa";
 import styled from "styled-components";

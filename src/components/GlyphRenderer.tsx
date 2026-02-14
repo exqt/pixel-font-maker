@@ -5,7 +5,7 @@ import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import { GlyphData } from '../models/glyphData';
 import EditorState from '../models/editorState';
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react-lite";
 
 const Wrapper = styled.div`
   background-color: #777;

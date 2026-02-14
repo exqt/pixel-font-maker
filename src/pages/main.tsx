@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AppStateContext, EditorStateContext } from '../contexts';
 import Project from '../models/project';
@@ -20,42 +20,29 @@ const StyledButtonText = styled.span`
   font-size: 20px;
 `
 
-const openProject = (file: File, editorState: EditorState, appState: AppState) => {
-  let fileReader = new FileReader();
-  fileReader.onload = () => {
-    let parsed = JSON.parse(fileReader.result.toString());
-    let proj = Project.loadJSON(parsed);
-    console.log(proj);
-    editorState.setProject(proj);
-    appState.setPage("editor");
-  }
-  fileReader.readAsText(file);
+const openProjectFromData = (data: string, editorState: EditorState, appState: AppState) => {
+  let parsed = JSON.parse(data);
+  let proj = Project.loadJSON(parsed);
+  console.log(proj);
+  editorState.setProject(proj);
+  appState.setPage("editor");
 }
 
 const OpenButton = () => {
-  let upload = useRef<HTMLInputElement>();
   let appState = useContext(AppStateContext);
   let editorState = useContext(EditorStateContext);
 
-  const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    let file = e.target.files[0];
-    openProject(file, editorState, appState);
+  const onClick = async () => {
+    const result = await window.electronAPI.openProject();
+    if (result) {
+      openProjectFromData(result.data, editorState, appState);
+    }
   }
 
   return (
-    <>
-      <input id="myInput"
-        type="file"
-        ref={(ref) => upload.current = ref}
-        style={{ display: 'none' }}
-        onChange={onChangeFile}
-      />
-      <Button onClick={()=>{upload.current.click()}}>
-        <StyledButtonText>Open Project</StyledButtonText>
-      </Button >
-    </>
+    <Button onClick={onClick}>
+      <StyledButtonText>Open Project</StyledButtonText>
+    </Button>
   )
 }
 
@@ -159,7 +146,11 @@ const DropdownZone = () => {
     e.preventDefault();
     if (e.dataTransfer.files) {
       let f = e.dataTransfer.files[0];
-      openProject(f, editorState, appState);
+      let fileReader = new FileReader();
+      fileReader.onload = () => {
+        openProjectFromData(fileReader.result.toString(), editorState, appState);
+      }
+      fileReader.readAsText(f);
     }
   }
 
@@ -174,6 +165,16 @@ const DropdownZone = () => {
 
 const MainPage = () => {
   const appState = useContext(AppStateContext);
+  const editorState = useContext(EditorStateContext);
+
+  useEffect(() => {
+    window.electronAPI.onMenuOpenProject(async () => {
+      const result = await window.electronAPI.openProject();
+      if (result) {
+        openProjectFromData(result.data, editorState, appState);
+      }
+    });
+  }, []);
 
   return (
     <Container>

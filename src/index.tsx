@@ -1,21 +1,16 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
+import './styles.css';
 import { AppStateContext, EditorStateContext } from './contexts';
 import AppState from './models/appState'
 import EditorState from './models/editorState';
 
-document.addEventListener("keydown", (e) => {
-  if ((e.key === 's' || e.key == 'g') && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-    e.preventDefault();
-  }
-}, false);
-
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!);
+root.render(
   <AppStateContext.Provider value={new AppState()}>
     <EditorStateContext.Provider value={new EditorState()}>
       <App />
     </EditorStateContext.Provider>
-  </AppStateContext.Provider>,
-  document.getElementById('root')
+  </AppStateContext.Provider>
 );

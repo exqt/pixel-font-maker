@@ -19,14 +19,12 @@ const Container = styled.div`
 
 const QuitConfirm = () => {
   useEffect(() => {
-    window.onbeforeunload = () => {
-      return "are you sure want to quit?";
-    }
-
-    return () => {
-      window.onbeforeunload = null;
-    }
-  })
+    window.electronAPI.onBeforeClose(() => {
+      if (confirm("Are you sure you want to quit?")) {
+        window.electronAPI.confirmClose();
+      }
+    });
+  }, []);
 
   return <></>;
 }

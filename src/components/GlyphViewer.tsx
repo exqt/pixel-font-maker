@@ -1,4 +1,4 @@
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react-lite";
 import React, { ChangeEventHandler, useContext, useState } from 'react';
 import styled, { css } from 'styled-components';
 import Selection, { SelectionItem } from './common/Selection';

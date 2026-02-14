@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components'
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react-lite";
 import TextInput from '../common/TextInput';
 import Project from '../../models/project';
 import NumberInput from '../common/NumberInput';
@@ -26,10 +26,10 @@ const PreviewTextarea = styled.textarea`
   box-sizing: border-box;
 `
 
-const GlobalStyle = createGlobalStyle`
+const GlobalStyle = createGlobalStyle<{$url: string}>`
   @font-face {
     font-family: previewFont;
-    src:url(${(props: {url: string}) => props.url});
+    src:url(${(props) => props.$url});
   }
 `
 
@@ -63,7 +63,7 @@ const FontPreviewModal = observer((props: {url: string}) => {
         onChangeValue={(v) => setSize(v)}
       />
       <Divider/>
-      <GlobalStyle url={props.url}/>
+      <GlobalStyle $url={props.url}/>
       <PreviewTextarea
         spellCheck={false}
         style={{fontSize: size + "px", position: "relative", left: offset.x + "px", top: offset.y + "px"}}

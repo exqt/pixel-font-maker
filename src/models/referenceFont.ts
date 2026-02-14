@@ -14,8 +14,9 @@ export class ReferenceFont {
     makeAutoObservable(this);
 
     if (!font) {
-      opentype.load("fonts/" + DEFAULT_REFERENCE_FONT)
-        .then((font) => {
+      window.electronAPI.readAsset("fonts/" + DEFAULT_REFERENCE_FONT)
+        .then((buffer) => {
+          const font = opentype.parse(buffer);
           this.setFont(font);
         })
         .catch((e) => {

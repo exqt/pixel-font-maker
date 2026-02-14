@@ -1,6 +1,6 @@
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import opentype from "opentype.js";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { FaEye, FaEyeSlash, FaSyncAlt } from "react-icons/fa";
 import styled from "styled-components";
 import { EditorStateContext } from "../contexts";
@@ -19,26 +19,20 @@ const Wrapper = styled.div`
 const FontInput = () => {
   let editorState = useContext(EditorStateContext);
 
-  const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    let file = e.target.files[0];
-    if (!file) return;
-    let url = URL.createObjectURL(file);
-
-    opentype.load(url)
-      .then((font) => {
+  const onClick = async () => {
+    const result = await window.electronAPI.openFont();
+    if (result) {
+      try {
+        const font = opentype.parse(result.buffer);
         editorState.referenceFont.setFont(font);
-      })
-      .catch((e) => {
+      } catch (e) {
         console.log(e);
-      });
+      }
+    }
   }
 
   return (
-    <>
-      <input type="file" accept=".ttf,.otf" onChange={onChangeFile}/>
-    </>
+    <Button compact={true} onClick={onClick}>Load Font</Button>
   )
 }
 

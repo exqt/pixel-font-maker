@@ -1,8 +1,16 @@
 /node_modules
 yarn-error.log
-dist/build
 
 src/temp.ts
 src/temp.js
 temp.txt
 note.txt
+
+# Build outputs
+/dist
+/dist-electron
+/release
+
+# Lock files (npm)
+package-lock.json
+yarn.lock

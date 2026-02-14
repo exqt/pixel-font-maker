@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components'
 import { AppStateContext, EditorStateContext } from '../contexts';
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react-lite";
 import Button from './common/Button';
 import { FaFileExport, FaSave, FaCog } from 'react-icons/fa';
 import ProjectSettingModal from './modals/ProjectSettingModal';
@@ -23,8 +23,9 @@ const MenuBar = observer(() => {
   let appState = useContext(AppStateContext);
 
   const preview = async () => {
-    let file = await project.toTrueTypeFile("ttf");
-    let url = URL.createObjectURL(file);
+    let result = await project.toTrueTypeFile("ttf");
+    let blob = new Blob([result.data], { type: 'font/ttf' });
+    let url = URL.createObjectURL(blob);
     appState.setModalContent(<FontPreviewModal url={url}/>);
   }
 

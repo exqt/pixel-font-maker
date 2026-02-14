@@ -4,7 +4,7 @@ import { Layer, Rect, Text, Line, Stage, Path } from 'react-konva';
 import { KonvaEventObject } from 'konva/types/Node';
 import { GlyphData } from '../models/glyphData';
 import { EditorStateContext } from '../contexts';
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react-lite";
 import EditorState from '../models/editorState';
 import { toCell } from '../utils';
 import { BRUSHES } from '../misc/brushes';

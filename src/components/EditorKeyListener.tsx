@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { AppStateContext, EditorStateContext } from '../contexts';
+import ExportModal from './modals/ExportModal';
 
 const EditorKeyListener = () => {
   let appState = useContext(AppStateContext);
@@ -11,7 +12,7 @@ const EditorKeyListener = () => {
       if (e.repeat) return;
       if (appState.isModalOpen) return;
 
-      if (e.ctrlKey) {
+      if (e.ctrlKey || e.metaKey) {
         if (e.key === "z") editorState.undo();
         else if (e.key === "x") editorState.cut();
         else if (e.key === "c") editorState.copy();
@@ -36,6 +37,17 @@ const EditorKeyListener = () => {
     }
 
     window.addEventListener("keydown", onKeyDown);
+
+    window.electronAPI.onMenuSaveProject(() => {
+      project.save();
+    });
+    window.electronAPI.onMenuUndo(() => {
+      editorState.undo();
+    });
+    window.electronAPI.onMenuExport(() => {
+      appState.setModalContent(<ExportModal project={project}/>);
+    });
+
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     }
