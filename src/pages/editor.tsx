@@ -3,13 +3,11 @@ import styled from 'styled-components'
 import GlyphEditor from '../components/GlyphEditor';
 import GlyphComponentList from '../components/GlyphComponentList'
 import GlyphViewer from '../components/GlyphViewer';
-import MenuBar from '../components/ProjectMenuBar';
+import AppMenuBar from '../components/AppMenuBar';
 import { AppStateContext, EditorStateContext } from '../contexts';
 import ReferenceFontOption from '../components/ReferenceFontOption';
 import GlyphInfo from '../components/GlyphInfo';
-import BackButton from '../components/common/BackButton';
 import EditorKeyListener from '../components/EditorKeyListener';
-import GlyphEditorTools from '../components/GlyphEditorTools';
 
 const Container = styled.div`
   width: 840px;
@@ -43,12 +41,10 @@ const EditorPage = () => {
     <Container>
       <QuitConfirm />
       <EditorKeyListener />
-      <BackButton onClick={backToMain} />
-      <MenuBar />
+      <AppMenuBar onBack={backToMain} />
       <ReferenceFontOption />
       <div style={{ display: 'flex', justifyContent: "space-between" }}>
         <div>
-          <GlyphEditorTools/>
           <GlyphEditor />
           <div style={{ display: 'grid', gridTemplateColumns: '50% 50%', marginTop: '4px', width: "432px" }}>
             <GlyphComponentList />

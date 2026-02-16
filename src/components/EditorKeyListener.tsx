@@ -13,10 +13,29 @@ const EditorKeyListener = () => {
       if (appState.isModalOpen) return;
 
       if (e.ctrlKey || e.metaKey) {
-        if (e.key === "x") editorState.cut();
+        if (e.shiftKey && (e.key === "z" || e.key === "Z")) {
+          e.preventDefault();
+          editorState.redo();
+        }
+        else if (e.key === "z") {
+          e.preventDefault();
+          editorState.undo();
+        }
+        else if (e.key === "y") {
+          e.preventDefault();
+          editorState.redo();
+        }
+        else if (e.key === "x") editorState.cut();
         else if (e.key === "c") editorState.copy();
         else if (e.key === "v") editorState.paste();
-        else if (e.key === "s") project.save();
+        else if (e.key === "s") {
+          e.preventDefault();
+          project.save();
+        }
+        else if (e.key === "e") {
+          e.preventDefault();
+          appState.setModalContent(<ExportModal project={project}/>);
+        }
         else if (e.key === "g") editorState.generateSelectedComponentGlyphSet(editorState.editingUnicode);
       }
 
@@ -36,19 +55,6 @@ const EditorKeyListener = () => {
     }
 
     window.addEventListener("keydown", onKeyDown);
-
-    window.electronAPI.onMenuSaveProject(() => {
-      project.save();
-    });
-    window.electronAPI.onMenuUndo(() => {
-      editorState.undo();
-    });
-    window.electronAPI.onMenuRedo(() => {
-      editorState.redo();
-    });
-    window.electronAPI.onMenuExport(() => {
-      appState.setModalContent(<ExportModal project={project}/>);
-    });
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);

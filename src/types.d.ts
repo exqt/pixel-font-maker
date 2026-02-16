@@ -13,10 +13,6 @@ interface ElectronAPI {
   confirmClose: () => void;
 
   onMenuOpenProject: (callback: () => void) => void;
-  onMenuSaveProject: (callback: () => void) => void;
-  onMenuExport: (callback: () => void) => void;
-  onMenuUndo: (callback: () => void) => void;
-  onMenuRedo: (callback: () => void) => void;
 }
 
 interface Window {

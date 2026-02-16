@@ -17,16 +17,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuOpenProject: (callback: () => void) => {
     ipcRenderer.on('menu-open-project', () => callback());
   },
-  onMenuSaveProject: (callback: () => void) => {
-    ipcRenderer.on('menu-save-project', () => callback());
-  },
-  onMenuExport: (callback: () => void) => {
-    ipcRenderer.on('menu-export', () => callback());
-  },
-  onMenuUndo: (callback: () => void) => {
-    ipcRenderer.on('menu-undo', () => callback());
-  },
-  onMenuRedo: (callback: () => void) => {
-    ipcRenderer.on('menu-redo', () => callback());
-  },
 });
