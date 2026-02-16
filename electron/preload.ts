@@ -26,4 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuUndo: (callback: () => void) => {
     ipcRenderer.on('menu-undo', () => callback());
   },
+  onMenuRedo: (callback: () => void) => {
+    ipcRenderer.on('menu-redo', () => callback());
+  },
 });

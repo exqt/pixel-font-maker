@@ -4,6 +4,8 @@ import { GlyphData } from "./glyphData";
 import Project from "./project";
 import { ReferenceFont } from "./referenceFont";
 import { toHex } from "../utils";
+import CommandHistory from "./commandHistory";
+import { GlyphDataCommand } from "./commands";
 
 export default class EditorState {
   project: Project;
@@ -15,8 +17,10 @@ export default class EditorState {
   referenceFont: ReferenceFont;
   zoom: number;
 
-  stack: Array<GlyphData>;
+  history: CommandHistory;
   clipboard?: GlyphData;
+
+  _brushStartSnapshot: GlyphData | null = null;
 
   selectedComponentGlyphSet: GlyphSet;
   hangulComponentGlyphSet: GlyphSet;
@@ -35,8 +39,9 @@ export default class EditorState {
     this.referenceFont = new ReferenceFont();
     this.zoom = 0;
 
-    this.stack = [];
+    this.history = new CommandHistory();
     this.clipboard = null;
+    this._brushStartSnapshot = null;
 
     this.selectedComponentGlyphSet = new GlyphSet("...");
   }
@@ -56,7 +61,6 @@ export default class EditorState {
 
   setEditingUnicode(unicode: number) {
     this.editingUnicode = unicode;
-    this.stack = [];
   }
 
   setZoom(zoom: number) {
@@ -72,15 +76,30 @@ export default class EditorState {
     this.brushType = bType;
   }
 
-  pushGlyphData() {
-    if (this.stack.length > 0 && this.stack[this.stack.length - 1].equals(this.glyphData)) return;
-    this.stack.push(this.glyphData);
+  beginBrushStroke() {
+    this._brushStartSnapshot = this.glyphData.clone();
   }
 
-  popGlyphData() {
-    if (this.stack.length > 0) {
-      this.glyphData = this.stack.pop();
+  endBrushStroke() {
+    if (!this._brushStartSnapshot) return;
+
+    let after = this.glyphData.clone();
+    after.limitWidth(this.project.attr.maxWidth);
+    this.setGlyphData(after);
+
+    if (!this._brushStartSnapshot.equals(after)) {
+      let cmd = new GlyphDataCommand(
+        this.project,
+        this.editingUnicode,
+        this._brushStartSnapshot,
+        after.clone(),
+        "Brush stroke"
+      );
+      this.history.push(cmd);
+      this.updateProject();
     }
+
+    this._brushStartSnapshot = null;
   }
 
   copyGlyphData() {
@@ -91,6 +110,17 @@ export default class EditorState {
     let g = this.project.getGlyph(this.editingUnicode).clone();
     g.setData(this.glyphData);
     this.project.setGlyph(this.editingUnicode, g);
+  }
+
+  private _recordGlyphCommand(before: GlyphData, description: string) {
+    let after = this.glyphData.clone();
+    let cmd = new GlyphDataCommand(this.project, this.editingUnicode, before, after, description);
+    this.history.push(cmd);
+  }
+
+  private _reloadGlyphFromProject() {
+    let g = this.project.getGlyph(this.editingUnicode);
+    this.glyphData = g.data.clone();
   }
 
   get cellSize() {
@@ -104,14 +134,20 @@ export default class EditorState {
   }
 
   clear() {
-    this.pushGlyphData();
+    let before = this.glyphData.clone();
     this.setGlyphData(new GlyphData());
+    this._recordGlyphCommand(before, "Clear");
     this.updateProject();
   }
 
   undo() {
-    this.popGlyphData();
-    this.updateProject();
+    this.history.undo();
+    this._reloadGlyphFromProject();
+  }
+
+  redo() {
+    this.history.redo();
+    this._reloadGlyphFromProject();
   }
 
   cut() {
@@ -121,39 +157,42 @@ export default class EditorState {
 
   copy() {
     this.copyGlyphData();
-    this.updateProject();
   }
 
   paste() {
     if (this.clipboard) {
-      this.pushGlyphData();
+      let before = this.glyphData.clone();
       this.glyphData = this.clipboard.clone();
+      this._recordGlyphCommand(before, "Paste");
       this.updateProject();
     }
   }
 
   shift(dx: number, dy: number) {
+    let before = this.glyphData.clone();
     let c = this.glyphData.clone();
     c.shift(dx, dy);
-    this.pushGlyphData();
     this.copyGlyphData();
     this.setGlyphData(c);
+    this._recordGlyphCommand(before, "Shift");
     this.updateProject();
   }
 
   flipH() {
+    let before = this.glyphData.clone();
     let c = this.glyphData.clone();
     c.flipH();
-    this.pushGlyphData();
     this.setGlyphData(c);
+    this._recordGlyphCommand(before, "Flip horizontal");
     this.updateProject();
   }
 
   flipV() {
+    let before = this.glyphData.clone();
     let c = this.glyphData.clone();
     c.flipV();
-    this.pushGlyphData();
     this.setGlyphData(c);
+    this._recordGlyphCommand(before, "Flip vertical");
     this.updateProject();
   }
 }

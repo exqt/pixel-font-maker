@@ -16,6 +16,7 @@ interface ElectronAPI {
   onMenuSaveProject: (callback: () => void) => void;
   onMenuExport: (callback: () => void) => void;
   onMenuUndo: (callback: () => void) => void;
+  onMenuRedo: (callback: () => void) => void;
 }
 
 interface Window {

@@ -232,7 +232,7 @@ const GlyphEditor = observer(() => {
     if (mouseState.down != -1) return;
 
     setMouseState({...mouseState, down: b});
-    editorState.pushGlyphData();
+    editorState.beginBrushStroke();
 
     let newGlyph = editorState.glyphData.clone();
     let [cx, cy] = toCell(e.evt.offsetX, editorSize - e.evt.offsetY, cellSize);
@@ -245,14 +245,7 @@ const GlyphEditor = observer(() => {
     let b = e.evt.button;
     if (mouseState.down != b) return;
     setMouseState({...mouseState, down: -1});
-
-    let gd = editorState.glyphData.clone();
-    gd.limitWidth(project.attr.maxWidth);
-    editorState.setGlyphData(gd);
-
-    let g = project.getGlyph(editorState.editingUnicode);
-    g.setData(gd);
-    project.setGlyph(editorState.editingUnicode, g);
+    editorState.endBrushStroke();
   }
 
   const onMouseMove = (e: KonvaEventObject<MouseEvent>) => {
