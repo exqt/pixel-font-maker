@@ -217,14 +217,6 @@ const GlyphEditor = observer(() => {
   useEffect(() => {
     let g = project.getGlyph(editorState.editingUnicode);
     editorState.setGlyphData(g.data.clone());
-    let prevUnicode = editorState.editingUnicode;
-
-    return () => {
-      let gd = editorState.glyphData;
-      let g = project.getGlyph(prevUnicode);
-      g.setData(gd);
-      project.setGlyph(prevUnicode, g);
-    }
   }, [editorState.editingUnicode])
 
   const onMouseDown = (e: KonvaEventObject<MouseEvent>) => {

@@ -5,7 +5,7 @@ import Project from "./project";
 import { ReferenceFont } from "./referenceFont";
 import { toHex } from "../utils";
 import CommandHistory from "./commandHistory";
-import { GlyphDataCommand } from "./commands";
+import { GlyphDataCommand, SelectGlyphCommand } from "./commands";
 
 export default class EditorState {
   project: Project;
@@ -60,7 +60,17 @@ export default class EditorState {
   }
 
   setEditingUnicode(unicode: number) {
+    if (unicode === this.editingUnicode) return;
+    let prev = this.editingUnicode;
+    this.updateProject();
     this.editingUnicode = unicode;
+    this._reloadGlyphFromProject();
+    let cmd = new SelectGlyphCommand(
+      (u) => { this.editingUnicode = u; },
+      prev,
+      unicode,
+    );
+    this.history.push(cmd);
   }
 
   setZoom(zoom: number) {
@@ -141,11 +151,13 @@ export default class EditorState {
   }
 
   undo() {
+    this.updateProject();
     this.history.undo();
     this._reloadGlyphFromProject();
   }
 
   redo() {
+    this.updateProject();
     this.history.redo();
     this._reloadGlyphFromProject();
   }

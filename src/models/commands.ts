@@ -34,3 +34,16 @@ export class GlyphDataCommand implements Command {
     this.project.setGlyph(this.unicode, g);
   }
 }
+
+export class SelectGlyphCommand implements Command {
+  readonly description = "Select glyph";
+
+  constructor(
+    private setUnicode: (unicode: number) => void,
+    private prevUnicode: number,
+    private newUnicode: number,
+  ) {}
+
+  undo() { this.setUnicode(this.prevUnicode); }
+  redo() { this.setUnicode(this.newUnicode); }
+}

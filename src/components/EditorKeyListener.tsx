@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { AppStateContext, EditorStateContext } from '../contexts';
 import ExportModal from './modals/ExportModal';
 
@@ -13,10 +13,7 @@ const EditorKeyListener = () => {
       if (appState.isModalOpen) return;
 
       if (e.ctrlKey || e.metaKey) {
-        if (e.key === "z" && e.shiftKey) editorState.redo();
-        else if (e.key === "z") editorState.undo();
-        else if (e.key === "y") editorState.redo();
-        else if (e.key === "x") editorState.cut();
+        if (e.key === "x") editorState.cut();
         else if (e.key === "c") editorState.copy();
         else if (e.key === "v") editorState.paste();
         else if (e.key === "s") project.save();

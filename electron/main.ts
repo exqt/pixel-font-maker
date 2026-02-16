@@ -69,6 +69,12 @@ function buildMenu() {
           accelerator: 'CmdOrCtrl+Shift+Z',
           click: () => mainWindow?.webContents.send('menu-redo'),
         },
+        {
+          label: 'Redo',
+          accelerator: 'CmdOrCtrl+Y',
+          visible: false,
+          click: () => mainWindow?.webContents.send('menu-redo'),
+        },
         { type: 'separator' },
         { role: 'cut' },
         { role: 'copy' },
